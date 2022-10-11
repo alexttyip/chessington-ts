@@ -7,8 +7,8 @@ export default class Board {
   currentPlayer: symbol
   board: (Piece | undefined)[][]
 
-  constructor() {
-    this.currentPlayer = Player.WHITE
+  constructor(currentPlayer?: symbol) {
+    this.currentPlayer = currentPlayer || Player.WHITE
     this.board = this.createBoard()
   }
 
