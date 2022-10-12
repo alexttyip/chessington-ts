@@ -1,6 +1,7 @@
 import Board from '../board'
 import Player from '../player'
 import Square from '../square'
+import { Pawn } from './pawn'
 import { Queen } from './queen'
 
 describe('Queen', () => {
@@ -67,5 +68,27 @@ describe('Queen', () => {
     const moves = queen.getAvailableMoves(board)
 
     expect(moves).toHaveLength(25)
+  })
+
+  it('cannot move through friendly pieces', () => {
+    const queen = new Queen(Player.WHITE)
+    const friendlyPiece = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(4, 4), queen)
+    board.setPiece(Square.at(4, 6), friendlyPiece)
+
+    const moves = queen.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(4, 7))
+  })
+
+  it('cannot move through opposing pieces', () => {
+    const queen = new Queen(Player.WHITE)
+    const opposingPiece = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), queen)
+    board.setPiece(Square.at(4, 6), opposingPiece)
+
+    const moves = queen.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(4, 7))
   })
 })
