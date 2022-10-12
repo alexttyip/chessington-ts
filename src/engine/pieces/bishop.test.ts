@@ -2,6 +2,7 @@ import Board from '../board'
 import Player from '../player'
 import Square from '../square'
 import { Bishop } from './bishop'
+import { King } from './king'
 import { Pawn } from './pawn'
 
 describe('Bishop', () => {
@@ -62,5 +63,38 @@ describe('Bishop', () => {
     const moves = bishop.getAvailableMoves(board)
 
     expect(moves).not.toContainEqual(Square.at(7, 7))
+  })
+
+  it('can take opposing pieces', () => {
+    const bishop = new Bishop(Player.WHITE)
+    const opposingPiece = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), bishop)
+    board.setPiece(Square.at(6, 6), opposingPiece)
+
+    const moves = bishop.getAvailableMoves(board)
+
+    expect(moves).toContainEqual(Square.at(6, 6))
+  })
+
+  it('cannot take the opposing king', () => {
+    const bishop = new Bishop(Player.WHITE)
+    const opposingKing = new King(Player.BLACK)
+    board.setPiece(Square.at(4, 4), bishop)
+    board.setPiece(Square.at(6, 6), opposingKing)
+
+    const moves = bishop.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(6, 6))
+  })
+
+  it('cannot take friendly pieces', () => {
+    const bishop = new Bishop(Player.WHITE)
+    const friendlyPiece = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(4, 4), bishop)
+    board.setPiece(Square.at(6, 6), friendlyPiece)
+
+    const moves = bishop.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(6, 6))
   })
 })
