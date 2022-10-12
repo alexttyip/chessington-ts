@@ -1,6 +1,7 @@
 import Board from '../board'
 import Player from '../player'
 import Square from '../square'
+import { King } from './king'
 import { Knight } from './knight'
 import { Pawn } from './pawn'
 
@@ -59,5 +60,38 @@ describe('Knight', () => {
     const expectedMoves = [Square.at(1, 2), Square.at(2, 1)]
 
     expect(moves).toEqual(expect.arrayContaining(expectedMoves))
+  })
+
+  it('can take opposing pieces', () => {
+    const knight = new Knight(Player.WHITE)
+    const opposingPiece = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), knight)
+    board.setPiece(Square.at(3, 6), opposingPiece)
+
+    const moves = knight.getAvailableMoves(board)
+
+    expect(moves).toContainEqual(Square.at(3, 6))
+  })
+
+  it('cannot take the opposing king', () => {
+    const knight = new Knight(Player.WHITE)
+    const opposingKing = new King(Player.BLACK)
+    board.setPiece(Square.at(4, 4), knight)
+    board.setPiece(Square.at(3, 6), opposingKing)
+
+    const moves = knight.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(3, 6))
+  })
+
+  it('cannot take friendly pieces', () => {
+    const knight = new Knight(Player.WHITE)
+    const friendlyPiece = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(4, 4), knight)
+    board.setPiece(Square.at(3, 6), friendlyPiece)
+
+    const moves = knight.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(3, 6))
   })
 })
