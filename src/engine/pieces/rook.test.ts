@@ -1,6 +1,7 @@
 import Board from '../board'
 import Player from '../player'
 import Square from '../square'
+import { King } from './king'
 import { Pawn } from './pawn'
 import { Rook } from './rook'
 
@@ -44,26 +45,59 @@ describe('Rook', () => {
 
     expect(moves).toHaveLength(14)
   })
-  
+
   it('cannot move through friendly pieces', () => {
-    const rook = new Rook(Player.WHITE);
-    const friendlyPiece = new Pawn(Player.WHITE);
-    board.setPiece(Square.at(4, 4), rook);
-    board.setPiece(Square.at(4, 6), friendlyPiece);
+    const rook = new Rook(Player.WHITE)
+    const friendlyPiece = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(4, 4), rook)
+    board.setPiece(Square.at(4, 6), friendlyPiece)
 
-    const moves = rook.getAvailableMoves(board);
+    const moves = rook.getAvailableMoves(board)
 
-    expect(moves).not.toContainEqual(Square.at(4, 7));
-});
+    expect(moves).not.toContainEqual(Square.at(4, 7))
+  })
 
-it('cannot move through opposing pieces', () => {
-    const rook = new Rook(Player.WHITE);
-    const opposingPiece = new Pawn(Player.BLACK);
-    board.setPiece(Square.at(4, 4), rook);
-    board.setPiece(Square.at(4, 6), opposingPiece);
+  it('cannot move through opposing pieces', () => {
+    const rook = new Rook(Player.WHITE)
+    const opposingPiece = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), rook)
+    board.setPiece(Square.at(4, 6), opposingPiece)
 
-    const moves = rook.getAvailableMoves(board);
+    const moves = rook.getAvailableMoves(board)
 
-    expect(moves).not.toContainEqual(Square.at(4, 7));
-});
+    expect(moves).not.toContainEqual(Square.at(4, 7))
+  })
+
+  it('can take opposing pieces', () => {
+    const rook = new Rook(Player.WHITE)
+    const opposingPiece = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), rook)
+    board.setPiece(Square.at(4, 6), opposingPiece)
+
+    const moves = rook.getAvailableMoves(board)
+
+    expect(moves).toContainEqual(Square.at(4, 6))
+  })
+
+  it('cannot take the opposing king', () => {
+    const rook = new Rook(Player.WHITE)
+    const opposingKing = new King(Player.BLACK)
+    board.setPiece(Square.at(4, 4), rook)
+    board.setPiece(Square.at(4, 6), opposingKing)
+
+    const moves = rook.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(4, 6))
+  })
+
+  it('cannot take friendly pieces', () => {
+    const rook = new Rook(Player.WHITE)
+    const friendlyPiece = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(4, 4), rook)
+    board.setPiece(Square.at(4, 6), friendlyPiece)
+
+    const moves = rook.getAvailableMoves(board)
+
+    expect(moves).not.toContainEqual(Square.at(4, 6))
+  })
 })
