@@ -30,6 +30,15 @@ describe('Pawn', () => {
       expect(moves).toContainEqual(Square.at(2, 7))
       expect(moves).toContainEqual(Square.at(3, 7))
     })
+
+    it('cannot move at the top of the board', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(7, 3), pawn)
+
+      const moves = pawn.getAvailableMoves(board)
+
+      expect(moves).toHaveLength(0)
+    })
   })
 
   describe('black pawns', () => {
@@ -56,6 +65,15 @@ describe('Pawn', () => {
       expect(moves).toHaveLength(2)
       expect(moves).toContainEqual(Square.at(4, 7))
       expect(moves).toContainEqual(Square.at(5, 7))
+    })
+
+    it('cannot move at the bottom of the board', () => {
+      const pawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(0, 3), pawn)
+
+      const moves = pawn.getAvailableMoves(board)
+
+      expect(moves).toHaveLength(0)
     })
   })
 
