@@ -1,4 +1,4 @@
-# chessington-js
+# chessington-ts
 
 Starter project for a chess-based TDD exercise
 
