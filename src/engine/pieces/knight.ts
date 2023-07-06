@@ -8,16 +8,7 @@ export class Knight extends Piece {
     super(player)
   }
 
-  getMoveIfValid(currentSquare: Square, rowDelta:number, colDelta:number) {
-    let newRow = currentSquare.row + rowDelta
-    let newCol = currentSquare.col + colDelta
 
-    if (this.isCoordinateValid(newRow, newCol)) {
-      return [new Square(newRow, newCol)]
-    } else {
-      return []
-    }
-  }
 
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)

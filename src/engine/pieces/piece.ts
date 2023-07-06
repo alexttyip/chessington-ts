@@ -30,6 +30,17 @@ export class Piece {
     return (Math.max(row, col) < 8 && Math.min(row, col) >= 0)
   }
 
+  getMoveIfValid(currentSquare: Square, rowDelta:number, colDelta:number) {
+    let newRow = currentSquare.row + rowDelta
+    let newCol = currentSquare.col + colDelta
+
+    if (this.isCoordinateValid(newRow, newCol)) {
+      return [new Square(newRow, newCol)]
+    } else {
+      return []
+    }
+  }
+
   getDiagonalMoves(currentSquare: Square) {
     let availableMoves = []
 
