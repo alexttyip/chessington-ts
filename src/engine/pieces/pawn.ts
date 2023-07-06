@@ -1,6 +1,6 @@
 import Board from '../board'
 import Player from '../player'
-import { Piece } from './piece'
+import { canMoveTo, Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
@@ -21,7 +21,7 @@ export class Pawn extends Piece {
       else {
         possibleMoves.push(Square.at(location.row - 1, location.col))
         if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
-          possibleMoves.push(Square.at(location.row -2, location.col))
+          possibleMoves.push(Square.at(location.row - 2, location.col))
         }
       }
 
@@ -31,7 +31,27 @@ export class Pawn extends Piece {
           filteredPossibleMoves.push(move);
         }
       }
-      return filteredPossibleMoves
+
+      possibleMoves = filteredPossibleMoves
+
+      if(this.player === Player.WHITE) {
+        let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)]
+        for (let newLocation of newLocations) {
+          if (_board.isInBoard(newLocation) && canMoveTo(this, _board.getPiece(newLocation)) && _board.getPiece(newLocation) !== undefined) {
+            possibleMoves.push(newLocation)
+          }
+        }
+      }
+      else {
+        let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)]
+        for (let newLocation of newLocations) {
+          if (_board.isInBoard(newLocation) && canMoveTo(this, _board.getPiece(newLocation)) && _board.getPiece(newLocation) !== undefined) {
+            possibleMoves.push(newLocation)
+          }
+        }
+      }
+
+      return possibleMoves
     }
     catch (e) {
       return [] as Square[]
