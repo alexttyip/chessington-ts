@@ -1,6 +1,7 @@
 import Board from '../board'
 import Player from '../player'
 import Square from '../square'
+import GameSettings from '../gameSettings'
 
 export function diagonalMoves(location : Square) : Square[] {
   let possibleMoves = []
@@ -25,16 +26,25 @@ export function diagonalMoves(location : Square) : Square[] {
   return possibleMoves
 }
 
-export function lateralMoves(location : Square) : Square[] {
+export function lateralMoves(location : Square, board : Board) : Square[] {
   let possibleMoves = []
-  for (let i = 0; i < 8; i++) {
-    if (i !== location.col) {
-      possibleMoves.push(Square.at(location.row, i))
-    }
-    if (i !== location.row) {
-      possibleMoves.push(Square.at(i, location.col))
-    }
+
+  for(let newColumn = location.col + 1; board.notOccupiedOrOutOfBounds(Square.at(location.row, newColumn)); newColumn++) {
+    possibleMoves.push(Square.at(location.row, newColumn))
   }
+
+  for(let newColumn = location.col - 1; board.notOccupiedOrOutOfBounds(Square.at(location.row, newColumn)); newColumn--) {
+    possibleMoves.push(Square.at(location.row, newColumn))
+  }
+
+  for(let newRow = location.row + 1; board.notOccupiedOrOutOfBounds(Square.at(newRow, location.col)); newRow++) {
+    possibleMoves.push(Square.at(newRow, location.col))
+  }
+
+  for(let newRow = location.row - 1; board.notOccupiedOrOutOfBounds(Square.at(newRow, location.col)); newRow--) {
+    possibleMoves.push(Square.at(newRow, location.col))
+  }
+
   return possibleMoves
 }
 
