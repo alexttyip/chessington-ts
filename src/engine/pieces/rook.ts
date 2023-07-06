@@ -9,7 +9,6 @@ export class Rook extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    const currentSquare = _board.findPiece(this)
-    return this.getLateralMoves(currentSquare)
+    return this.getLateralMoves(_board)
   }
 }

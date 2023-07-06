@@ -9,32 +9,70 @@ export class Piece {
     this.player = player
   }
 
-  getLateralMoves(currentSquare: Square) {
+  getLateralMoves(board: Board) {
+    const currentSquare = board.findPiece(this)
     let availableMoves = []
 
-    for (let row = 0; row <= 7; row++) {
-      if (row !== currentSquare.row) {
-        availableMoves.push(new Square(row, currentSquare.col))
+    for (let i = 1; i < 8; i++) {
+      let newRow = currentSquare.row + i
+      if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
+        break
       }
+      availableMoves.push(new Square(newRow, currentSquare.col))
     }
-    for (let col = 0; col <= 7; col++) {
-      if (col !== currentSquare.col) {
-        availableMoves.push(new Square(currentSquare.row, col))
+
+    for (let i = 1; i < 8; i++) {
+      let newRow = currentSquare.row - i
+      if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
+        break
       }
+      availableMoves.push(new Square(newRow, currentSquare.col))
+    }
+
+    for (let i = 1; i < 8; i++) {
+      let newCol = currentSquare.col + i
+      if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
+        break
+      }
+      availableMoves.push(new Square(currentSquare.row, newCol))
+    }
+
+    for (let i = 1; i < 8; i++) {
+      let newCol = currentSquare.col - i
+      if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
+        break
+      }
+      availableMoves.push(new Square(currentSquare.row, newCol))
     }
 
     return availableMoves as Square[]
   }
 
-  isCoordinateValid(row: number, col: number) {
-    return (Math.max(row, col) < 8 && Math.min(row, col) >= 0)
+  isCoordinateOutOfBound(row: number, col: number) {
+    return !(Math.max(row, col) < 8 && Math.min(row, col) >= 0)
+  }
+
+  isSteppingOnFriendlyPiece(row: number, col: number, board: Board) {
+    return board.getPiece(new Square(row, col))?.player === this.player
+  }
+
+  isCoordinateValid(row: number, col: number, board: Board) {
+    if (this.isCoordinateOutOfBound(row, col)) {
+      return false
+    }
+
+    if (this.isSteppingOnFriendlyPiece(row, col, board)) {
+      return false
+    }
+
+    return true
   }
 
   getMoveIfValid(currentSquare: Square, rowDelta:number, colDelta:number) {
     let newRow = currentSquare.row + rowDelta
     let newCol = currentSquare.col + colDelta
 
-    if (this.isCoordinateValid(newRow, newCol)) {
+    if (!this.isCoordinateOutOfBound(newRow, newCol)) {
       return [new Square(newRow, newCol)]
     } else {
       return []
@@ -47,7 +85,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col + i
-      if (!this.isCoordinateValid(newRow, newCol)) {
+      if (this.isCoordinateOutOfBound(newRow, newCol)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -56,7 +94,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col + i
-      if (!this.isCoordinateValid(newRow, newCol)) {
+      if (this.isCoordinateOutOfBound(newRow, newCol)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -65,7 +103,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col - i
-      if (!this.isCoordinateValid(newRow, newCol)) {
+      if (this.isCoordinateOutOfBound(newRow, newCol)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -74,7 +112,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col - i
-      if (!this.isCoordinateValid(newRow, newCol)) {
+      if (this.isCoordinateOutOfBound(newRow, newCol)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
