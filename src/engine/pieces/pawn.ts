@@ -8,20 +8,39 @@ export class Pawn extends Piece {
     super(player)
   }
 
+  checkPossiblePath(_board: Board, currentSquare: Square, rowDelta: number) {
+    const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col)
+    if (rowDelta === 2) {
+      const adjacentPosition = new Square(currentSquare.row + 1, currentSquare.col)
+      if (_board.getPiece(newPosition) === undefined && _board.getPiece(adjacentPosition) === undefined) {
+        return [newPosition]
+      }
+    } else if (rowDelta === -2) {
+      const adjacentPosition = new Square(currentSquare.row - 1, currentSquare.col)
+      if (_board.getPiece(newPosition) === undefined && _board.getPiece(adjacentPosition) === undefined) {
+        return [newPosition]
+      }
+    } else if (_board.getPiece(newPosition) === undefined) {
+      return [newPosition]
+    }
+    return []
+  }
+
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
-    let availableMoves = []
+    let availableMoves: Square[] = []
     if (this.player === Player.WHITE) {
-      availableMoves.push(new Square(currentSquare.row + 1, currentSquare.col))
+      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1))
       if (currentSquare.row === 1) {
-        availableMoves.push(new Square(currentSquare.row + 2, currentSquare.col))
+        availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2))
       }
-    } else {
-      availableMoves.push(new Square(currentSquare.row-1, currentSquare.col))
-      if (currentSquare.row === 6) {
-        availableMoves.push(new Square(currentSquare.row-2, currentSquare.col))
-      }
+      return availableMoves
     }
-    return availableMoves as Square[]
+
+    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, -1))
+    if (currentSquare.row === 6) {
+      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, -2))
+    }
+    return availableMoves
   }
 }
