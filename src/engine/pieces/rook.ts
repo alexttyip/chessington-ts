@@ -9,8 +9,12 @@ export class Rook extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    let moves:Square[] = [];
     let currentSquare = _board.findPiece(this);
+    return Rook.getMoves(_board, currentSquare);
+  }
+
+  static getMoves(_board:Board, currentSquare:Square) {
+    let moves:Square[] = [];
 
     for(let row = 0; row < _board.board.length; row++) {
       if(row !== currentSquare.row){

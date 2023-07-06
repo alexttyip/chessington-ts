@@ -8,8 +8,12 @@ export class Bishop extends Piece {
   }
 
   getAvailableMoves(_board: Board) {
-    let moves:Square[] = [];
     let currentSquare = _board.findPiece(this);
+    return Bishop.getMoves(_board, currentSquare);
+  }
+
+  static getMoves(_board: Board, currentSquare:Square) {
+    let moves:Square[] = [];
 
     for(let row = 0; row < _board.board.length; row++) {
       if (row === currentSquare.row) {
