@@ -9,6 +9,21 @@ export class Rook extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+    try {
+      let location = _board.findPiece(this)
+      let possibleMoves = []
+      for (let i = 0; i < 8; i++) {
+        if (i !== location.col) {
+          possibleMoves.push(Square.at(location.row, i))
+        }
+        if (i !== location.row) {
+          possibleMoves.push(Square.at(i, location.col))
+        }
+      }
+      return possibleMoves
+    }
+    catch (e) {
+      return [] as Square[]
+    }
   }
 }
