@@ -9,70 +9,38 @@ export class Piece {
     this.player = player
   }
 
-  getLateralMoves(board: Board) {
+  goInADirectionAndReturnAvailableMoves(board: Board, rowDelta: number, colDelta: number) {
     const currentSquare = board.findPiece(this)
     let availableMoves = []
-
     let hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row + i
-      if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
+      let newRow = currentSquare.row + rowDelta * i
+      let newCol = currentSquare.col + colDelta * i
+      if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
       if (hitEnemyYet) {
         break
       }
-      if (this.isSteppingOnEnemyPiece(newRow, currentSquare.col, board)) {
+      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
         hitEnemyYet = true
       }
-      availableMoves.push(new Square(newRow, currentSquare.col))
+      availableMoves.push(new Square(newRow, newCol))
     }
+    return availableMoves
+  }
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row - i
+  getLateralMoves(board: Board) {
+    const currentSquare = board.findPiece(this)
+    let availableMoves: Square[] = []
 
-      if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(newRow, currentSquare.col, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(newRow, currentSquare.col))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 0))
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newCol = currentSquare.col + i
-      if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(currentSquare.row, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(currentSquare.row, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 0))
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newCol = currentSquare.col - i
-      if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(currentSquare.row, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(currentSquare.row, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, 1))
+
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, -1))
 
     return availableMoves as Square[]
   }
@@ -108,7 +76,7 @@ export class Piece {
 
     if (this)
 
-    return true
+      return true
   }
 
   getMoveIfValid(currentSquare: Square, rowDelta: number, colDelta: number) {
@@ -124,71 +92,16 @@ export class Piece {
 
   getDiagonalMoves(board: Board) {
     const currentSquare = board.findPiece(this)
-    let availableMoves = []
+    let availableMoves: Square[] = []
 
-    let hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row + i
-      let newCol = currentSquare.col + i
-      if (!this.isCoordinateValid(newRow, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(newRow, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 1))
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row - i
-      let newCol = currentSquare.col + i
-      if (!this.isCoordinateValid(newRow, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(newRow, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 1))
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row - i
-      let newCol = currentSquare.col - i
-      if (!this.isCoordinateValid(newRow, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(newRow, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, -1))
 
-    hitEnemyYet = false
-    for (let i = 1; i < 8; i++) {
-      let newRow = currentSquare.row + i
-      let newCol = currentSquare.col - i
-      if (!this.isCoordinateValid(newRow, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
-        break
-      }
-      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
-        hitEnemyYet = true
-      }
-      availableMoves.push(new Square(newRow, newCol))
-    }
+    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, -1))
+
     return availableMoves as Square[]
 
   }
