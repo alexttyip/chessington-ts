@@ -48,4 +48,15 @@ export default class Board {
         this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE
     }
   }
+
+  isInBoard(squareLocation: Square) : boolean {
+    if (squareLocation.row > GameSettings.BOARD_SIZE - 1 || squareLocation.row < 0) {
+      return false
+    }
+    if (squareLocation.col > GameSettings.BOARD_SIZE - 1 || squareLocation.col < 0) {
+      return false
+    }
+    return true
+  }
 }
+
