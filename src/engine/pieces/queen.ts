@@ -14,7 +14,7 @@ export class Queen extends Piece {
     let currentSquare = _board.findPiece(this);
 
     let moves = Bishop.getMoves(_board, currentSquare)
-    moves = moves.concat(Rook.getMoves(_board, currentSquare));
+    moves = moves.concat(Rook.getMoves(_board, this));
 
     return moves;
   }
