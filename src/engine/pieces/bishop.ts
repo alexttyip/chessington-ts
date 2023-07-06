@@ -7,6 +7,10 @@ export class Bishop extends Piece {
     super(player)
   }
 
+  isCoordinateValid(row: number, col: number) {
+    return (Math.max(row,col) < 8 && Math.min(row,col) >= 0)
+  }
+
   getAvailableMoves(_board: Board) {
     const currentSquare = _board.findPiece(this)
     let availableMoves = []
@@ -14,7 +18,7 @@ export class Bishop extends Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col + i
-      if (newRow > 7 || newCol > 7) {
+      if (!this.isCoordinateValid(newRow,newCol)) {
         break
       }
       availableMoves.push(new Square(newRow,newCol))
@@ -23,7 +27,7 @@ export class Bishop extends Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col + i
-      if (newRow < 0 || newCol > 7) {
+      if (!this.isCoordinateValid(newRow,newCol)) {
         break
       }
       availableMoves.push(new Square(newRow,newCol))
@@ -32,7 +36,7 @@ export class Bishop extends Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col - i
-      if (newRow < 0 || newCol < 0) {
+      if (!this.isCoordinateValid(newRow,newCol)) {
         break
       }
       availableMoves.push(new Square(newRow,newCol))
@@ -41,7 +45,7 @@ export class Bishop extends Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col - i
-      if (newRow > 7 || newCol < 0) {
+      if (!this.isCoordinateValid(newRow,newCol)) {
         break
       }
       availableMoves.push(new Square(newRow,newCol))
