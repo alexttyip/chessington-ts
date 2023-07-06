@@ -10,7 +10,12 @@ export function isKing(piece: Piece | undefined) {
   return piece?.constructor.name === 'King'
 }
 
-export function canMoveTo(playerPiece: Piece | undefined, testPiece: Piece | undefined) : boolean {
+export function canCapture(playerLocation: Square, testLocation: Square, board: Board) : boolean {
+  if (!board.isInBoard(testLocation)) {
+    return false
+  }
+  const testPiece = board.getPiece(testLocation)
+  const playerPiece = board.getPiece(playerLocation)
   return !isKing(testPiece) && playerPiece?.player !== testPiece?.player
 }
 
@@ -20,8 +25,9 @@ export function exploreSides(location: Square, board: Board, locationChanges: nu
   for (let locationChange of locationChanges) {
     for(let steps = 1; steps < gameSettings.BOARD_SIZE; steps++) {
       let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps)
+
       if(!board.notOccupiedOrOutOfBounds(newLocation)) {
-        if (board.isInBoard(newLocation) && canMoveTo(board.getPiece(location), board.getPiece(newLocation))) {
+        if (canCapture(location, newLocation, board)) {
           possibleMoves.push(newLocation)
         }
         break

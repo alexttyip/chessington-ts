@@ -1,6 +1,6 @@
 import Board from '../board'
 import Player from '../player'
-import { canMoveTo, Piece } from './piece'
+import { canCapture, Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
@@ -37,7 +37,7 @@ export class Pawn extends Piece {
       if(this.player === Player.WHITE) {
         let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)]
         for (let newLocation of newLocations) {
-          if (_board.isInBoard(newLocation) && canMoveTo(this, _board.getPiece(newLocation)) && _board.getPiece(newLocation) !== undefined) {
+          if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
             possibleMoves.push(newLocation)
           }
         }
@@ -45,7 +45,7 @@ export class Pawn extends Piece {
       else {
         let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)]
         for (let newLocation of newLocations) {
-          if (_board.isInBoard(newLocation) && canMoveTo(this, _board.getPiece(newLocation)) && _board.getPiece(newLocation) !== undefined) {
+          if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
             possibleMoves.push(newLocation)
           }
         }
