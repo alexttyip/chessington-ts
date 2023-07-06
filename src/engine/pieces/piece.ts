@@ -2,50 +2,32 @@ import Board from '../board'
 import Player from '../player'
 import Square from '../square'
 import GameSettings from '../gameSettings'
+import gameSettings from '../gameSettings'
 
-export function diagonalMoves(location : Square) : Square[] {
+
+export function exploreSides(location: Square, board: Board, locationChanges: number[][]) {
   let possibleMoves = []
-  let sum = location.row + location.col
-  let diff = location.row - location.col
-  for (let i = 0; i < 8; i++) {
-    let newRow = i
-    if (newRow === location.row) {
-      continue
-    }
-
-    let newColumn = sum - newRow
-    if (newColumn >= 0 && newColumn <= 7) {
-      possibleMoves.push(Square.at(newRow, newColumn))
-    }
-
-    newColumn = newRow - diff
-    if (newColumn >= 0 && newColumn <= 7) {
-      possibleMoves.push(Square.at(newRow, newColumn))
+  for (let locationChange of locationChanges) {
+    for(let steps = 1; steps < gameSettings.BOARD_SIZE; steps++) {
+      let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps)
+      if(!board.notOccupiedOrOutOfBounds(newLocation)) {
+        break
+      }
+      possibleMoves.push(newLocation)
     }
   }
   return possibleMoves
 }
 
+export function diagonalMoves(location : Square, board: Board) : Square[] {
+  let locationChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1]]
+  return exploreSides(location, board, locationChanges)
+}
+
+
 export function lateralMoves(location : Square, board : Board) : Square[] {
-  let possibleMoves = []
-
-  for(let newColumn = location.col + 1; board.notOccupiedOrOutOfBounds(Square.at(location.row, newColumn)); newColumn++) {
-    possibleMoves.push(Square.at(location.row, newColumn))
-  }
-
-  for(let newColumn = location.col - 1; board.notOccupiedOrOutOfBounds(Square.at(location.row, newColumn)); newColumn--) {
-    possibleMoves.push(Square.at(location.row, newColumn))
-  }
-
-  for(let newRow = location.row + 1; board.notOccupiedOrOutOfBounds(Square.at(newRow, location.col)); newRow++) {
-    possibleMoves.push(Square.at(newRow, location.col))
-  }
-
-  for(let newRow = location.row - 1; board.notOccupiedOrOutOfBounds(Square.at(newRow, location.col)); newRow--) {
-    possibleMoves.push(Square.at(newRow, location.col))
-  }
-
-  return possibleMoves
+  let locationChanges = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+  return exploreSides(location, board, locationChanges)
 }
 
 export class Piece {
