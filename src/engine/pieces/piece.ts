@@ -3,14 +3,23 @@ import Player from '../player'
 import Square from '../square'
 import GameSettings from '../gameSettings'
 import gameSettings from '../gameSettings'
+import { King } from './king'
 
+
+export function isKing(piece: Piece | undefined) {
+  return piece?.constructor.name === 'King'
+}
 
 export function exploreSides(location: Square, board: Board, locationChanges: number[][]) {
+  const piece = board.getPiece(location)
   let possibleMoves = []
   for (let locationChange of locationChanges) {
     for(let steps = 1; steps < gameSettings.BOARD_SIZE; steps++) {
       let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps)
       if(!board.notOccupiedOrOutOfBounds(newLocation)) {
+        if (board.isInBoard(newLocation) && board.getPiece(newLocation)?.player !== piece?.player && !isKing(board.getPiece(newLocation))) {
+          possibleMoves.push(newLocation)
+        }
         break
       }
       possibleMoves.push(newLocation)
@@ -46,4 +55,6 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     board.movePiece(currentSquare, newSquare)
   }
+
+
 }

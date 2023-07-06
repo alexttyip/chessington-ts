@@ -1,6 +1,6 @@
 import Board from '../board'
 import Player from '../player'
-import { diagonalMoves, Piece } from './piece'
+import { Piece } from './piece'
 import Square from '../square'
 
 export class Knight extends Piece {
