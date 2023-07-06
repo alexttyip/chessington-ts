@@ -32,9 +32,11 @@ export class Knight extends Piece {
   static addMove(_board:Board, row:number, col:number, moves:Square[], piece:Piece){
     let targetSquare = Square.at(row, col);
     let potentialPiece = _board.getPiece(targetSquare);
+
     if(!!potentialPiece && (potentialPiece.player === piece.player || potentialPiece instanceof King)){
       return;
     }
+
     if(col >= 0 && col < _board.board[row].length){
       moves.push(Square.at(row, col));
     }

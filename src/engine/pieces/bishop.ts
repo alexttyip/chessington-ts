@@ -45,9 +45,11 @@ export class Bishop extends Piece {
     let currentSquare = _board.findPiece(piece);
     const newRow = currentSquare.row + offset;
     const newCol = currentSquare.col + colOffsetReverse*offset;
+
     if(newCol >= _board.board[0].length || newCol < 0) {
       return -1;
     }
+
     let potentialBlock = _board.getPiece(Square.at(newRow, newCol))
     if(!!potentialBlock) {
       if (potentialBlock.player !== piece.player && !(potentialBlock instanceof King)) {
@@ -55,6 +57,7 @@ export class Bishop extends Piece {
       }
       return -1;
     }
+
     moves.push(Square.at(newRow, newCol));
     return 0
   }
