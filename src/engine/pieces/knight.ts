@@ -23,14 +23,11 @@ export class Knight extends Piece {
     const currentSquare = _board.findPiece(this)
     let availableMoves: Square[] = []
 
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 2, 1))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 2, -1))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -2, 1))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -2, -1))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 1, 2))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -1, 2))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 1, -2))
-    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -1, -2))
+    const movesCombo = [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [-1, 2], [1, -2], [-1, -2]]
+
+    movesCombo.forEach((combo: number[]) => {
+      availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, combo[0], combo[1]))
+    })
 
     return availableMoves
   }
