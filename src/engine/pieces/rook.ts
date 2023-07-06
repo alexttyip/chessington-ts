@@ -9,6 +9,15 @@ export class Rook extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+    const currentSquare = _board.findPiece(this)
+    let availableMoves = []
+
+    for (let i = 0; i <= 7; i++) {
+      availableMoves.push(new Square(i, currentSquare.col))
+      availableMoves.push(new Square(currentSquare.row, i))
+    }
+    availableMoves.splice(availableMoves.findIndex((item) => item.col === currentSquare.col && item.row === currentSquare.row), 1)
+    availableMoves.splice(availableMoves.findIndex((item) => item.col === currentSquare.col && item.row === currentSquare.row), 1)
+    return availableMoves as Square[]
   }
 }
