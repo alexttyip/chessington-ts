@@ -79,19 +79,30 @@ export class Piece {
       return true
   }
 
-  getMoveIfValid(currentSquare: Square, rowDelta: number, colDelta: number) {
+  getMoveIfValid(board: Board, rowDelta: number, colDelta: number) {
+
+    const currentSquare = board.findPiece(this)
     let newRow = currentSquare.row + rowDelta
     let newCol = currentSquare.col + colDelta
 
-    if (!this.isCoordinateOutOfBound(newRow, newCol)) {
-      return [new Square(newRow, newCol)]
-    } else {
+
+
+    if (this.isCoordinateOutOfBound(newRow, newCol)) {
       return []
     }
+    if (this.isSteppingOnFriendlyPiece(newRow, newCol, board)) {
+      return []
+    }
+
+    if (this.isSteppingOnEnemyKing(newRow, newCol, board)) {
+      return []
+    }
+
+
+    return [new Square(newRow, newCol)]
   }
 
   getDiagonalMoves(board: Board) {
-    const currentSquare = board.findPiece(this)
     let availableMoves: Square[] = []
 
     availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 1))

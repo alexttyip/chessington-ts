@@ -14,7 +14,7 @@ export class King extends Piece {
     const movesCombo = [[0,1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
 
     movesCombo.forEach((combo: number[]) => {
-      availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, combo[0], combo[1]))
+      availableMoves = availableMoves.concat(this.getMoveIfValid(_board, combo[0], combo[1]))
     })
 
     return availableMoves
