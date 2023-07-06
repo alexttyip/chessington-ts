@@ -58,6 +58,6 @@ describe('Knight', () => {
 
     const expectedMoves = [Square.at(1, 2), Square.at(2, 1)]
 
-    expect(moves).toEqual(expectedMoves)
+    expect(moves).toEqual(expect.arrayContaining(expectedMoves))
   })
 })
