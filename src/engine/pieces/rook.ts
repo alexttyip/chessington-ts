@@ -12,12 +12,17 @@ export class Rook extends Piece {
     const currentSquare = _board.findPiece(this)
     let availableMoves = []
 
-    for (let i = 0; i <= 7; i++) {
-      availableMoves.push(new Square(i, currentSquare.col))
-      availableMoves.push(new Square(currentSquare.row, i))
+    for (let row = 0; row <= 7; row++) {
+      if (row !== currentSquare.row) {
+        availableMoves.push(new Square(row, currentSquare.col))
+      }
     }
-    availableMoves.splice(availableMoves.findIndex((item) => item.col === currentSquare.col && item.row === currentSquare.row), 1)
-    availableMoves.splice(availableMoves.findIndex((item) => item.col === currentSquare.col && item.row === currentSquare.row), 1)
+    for (let col = 0; col <= 7; col++) {
+      if (col !== currentSquare.col) {
+        availableMoves.push(new Square(currentSquare.row, col))
+      }
+    }
+
     return availableMoves as Square[]
   }
 }
