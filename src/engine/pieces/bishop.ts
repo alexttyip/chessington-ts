@@ -51,7 +51,7 @@ export class Bishop extends Piece {
     }
 
     let potentialBlock = _board.getPiece(Square.at(newRow, newCol))
-    if(!!potentialBlock) {
+    if(potentialBlock !== undefined) {
       if (potentialBlock.player !== piece.player && !(potentialBlock instanceof King)) {
         moves.push(Square.at(newRow, newCol));
       }

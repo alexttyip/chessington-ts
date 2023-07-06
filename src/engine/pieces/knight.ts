@@ -33,7 +33,7 @@ export class Knight extends Piece {
     let targetSquare = Square.at(row, col);
     let potentialPiece = _board.getPiece(targetSquare);
 
-    if(!!potentialPiece && (potentialPiece.player === piece.player || potentialPiece instanceof King)){
+    if(potentialPiece !== undefined && (potentialPiece.player === piece.player || potentialPiece instanceof King)){
       return;
     }
 

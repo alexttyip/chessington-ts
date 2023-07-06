@@ -41,7 +41,7 @@ export class Rook extends Piece {
   static addRowMove(_board:Board, currentSquare:Square, moves:Square[], row:number, player:Player) {
     let potentialBlock = _board.getPiece(Square.at(row, currentSquare.col))
 
-    if(!!potentialBlock) {
+    if(potentialBlock !== undefined) {
       if(potentialBlock.player !== player && !(potentialBlock instanceof King)){
         moves.push(Square.at(row, currentSquare.col));
       }
@@ -55,7 +55,7 @@ export class Rook extends Piece {
   static addColMove(_board:Board, currentSquare:Square, moves:Square[], col:number, player:Player) {
     let potentialBlock = _board.getPiece(Square.at(currentSquare.row, col))
 
-    if(!!potentialBlock) {
+    if(potentialBlock !== undefined) {
       if(potentialBlock.player !== player && !(potentialBlock instanceof King)){
         moves.push(Square.at(currentSquare.row, col));
       }

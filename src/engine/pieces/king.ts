@@ -20,7 +20,7 @@ export class King extends Piece {
         }
 
         let potentialPiece = _board.getPiece(Square.at(row, col));
-        if(!!potentialPiece && (potentialPiece.player === this.player || potentialPiece instanceof King)) {
+        if(potentialPiece !== undefined && (potentialPiece.player === this.player || potentialPiece instanceof King)) {
           continue;
         }
 

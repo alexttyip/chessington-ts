@@ -39,18 +39,18 @@ export class Pawn extends Piece {
   }
 
   blockMovement(_board:Board, currentSquare:Square, delta:number) {
-    return !!_board.getPiece(Square.at(currentSquare.row + delta, currentSquare.col));
+    return _board.getPiece(Square.at(currentSquare.row + delta, currentSquare.col)) !== undefined;
   }
 
   offBoard(_board:Board, currentSquare:Square, delta:number){
     return currentSquare.row + delta >= _board.board.length || currentSquare.row + delta < 0
-      || !!_board.getPiece(Square.at(currentSquare.row + delta, currentSquare.col));
+      || _board.getPiece(Square.at(currentSquare.row + delta, currentSquare.col)) !== undefined;
   }
 
   checkDiagonal(_board: Board, moves:Square[], direction:number, delta:number, currentSquare:Square) {
     const targetSquare = Square.at(currentSquare.row + delta, currentSquare.col + direction);
     const potentialKill = _board.getPiece(targetSquare)
-    if(!!potentialKill && !(potentialKill.player === this.player || potentialKill instanceof King)) {
+    if(potentialKill !== undefined && !(potentialKill.player === this.player || potentialKill instanceof King)) {
       moves.push(targetSquare);
     }
   }
