@@ -29,17 +29,15 @@ export class Pawn extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
     let availableMoves: Square[] = []
+    let modifier
     if (this.player === Player.WHITE) {
-      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1))
-      if (currentSquare.row === 1) {
-        availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2))
-      }
-      return availableMoves
+      modifier = 1
+    } else {
+      modifier = -1
     }
-
-    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, -1))
-    if (currentSquare.row === 6) {
-      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, -2))
+    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1 * modifier))
+    if (currentSquare.row === 1 || currentSquare.row === 6) {
+      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * modifier))
     }
     return availableMoves
   }
