@@ -1,5 +1,5 @@
 import Board from '../board'
-import { Piece } from './piece'
+import { canMoveTo, Piece } from './piece'
 import Square from '../square'
 
 
@@ -16,7 +16,7 @@ export class King extends Piece {
       let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]]
       for (let change of possibleChanges) {
         let newLocation = Square.at(location.row + change[0], location.col + change[1])
-        if (_board.isInBoard(newLocation)) {
+        if (_board.isInBoard(newLocation) && canMoveTo(_board.getPiece(location), _board.getPiece(newLocation))) {
           possibleMoves.push(newLocation)
         }
       }
