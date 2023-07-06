@@ -79,13 +79,13 @@ export class Piece {
     }
   }
 
-  getDiagonalMoves(currentSquare: Square) {
+  getDiagonalMoves(currentSquare: Square, board: Board) {
     let availableMoves = []
 
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col + i
-      if (this.isCoordinateOutOfBound(newRow, newCol)) {
+      if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -94,7 +94,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col + i
-      if (this.isCoordinateOutOfBound(newRow, newCol)) {
+      if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -103,7 +103,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col - i
-      if (this.isCoordinateOutOfBound(newRow, newCol)) {
+      if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))
@@ -112,7 +112,7 @@ export class Piece {
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col - i
-      if (this.isCoordinateOutOfBound(newRow, newCol)) {
+      if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
       availableMoves.push(new Square(newRow, newCol))

@@ -11,7 +11,7 @@ export class Queen extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
     const lateralMoves = this.getLateralMoves(_board)
-    const diagonalMoves = this.getDiagonalMoves(currentSquare)
+    const diagonalMoves = this.getDiagonalMoves(currentSquare, _board)
     return lateralMoves.concat(diagonalMoves)
   }
 }
