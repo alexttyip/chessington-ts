@@ -47,7 +47,7 @@ export class Pawn extends Piece {
     } else {
       direction = -1
     }
-    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1 * direction))
+    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, direction))
     if (currentSquare.row === 1 || currentSquare.row === 6) {
       availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * direction))
     }
