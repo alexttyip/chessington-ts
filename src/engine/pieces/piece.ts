@@ -13,34 +13,64 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     let availableMoves = []
 
+    let hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
+
       if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
         break
+      }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, currentSquare.col, board)) {
+        hitEnemyYet = true
       }
       availableMoves.push(new Square(newRow, currentSquare.col))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
+
       if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
         break
+      }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, currentSquare.col, board)) {
+        hitEnemyYet = true
       }
       availableMoves.push(new Square(newRow, currentSquare.col))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newCol = currentSquare.col + i
       if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
         break
       }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(currentSquare.row, newCol, board)) {
+        hitEnemyYet = true
+      }
       availableMoves.push(new Square(currentSquare.row, newCol))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newCol = currentSquare.col - i
       if (!this.isCoordinateValid(currentSquare.row, newCol, board)) {
         break
+      }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(currentSquare.row, newCol, board)) {
+        hitEnemyYet = true
       }
       availableMoves.push(new Square(currentSquare.row, newCol))
     }
@@ -52,8 +82,12 @@ export class Piece {
     return !(Math.max(row, col) < 8 && Math.min(row, col) >= 0)
   }
 
-  isSteppingOnPiece(row: number, col: number, board: Board) {
-    return board.getPiece(new Square(row, col)) !== undefined
+  isSteppingOnFriendlyPiece(row: number, col: number, board: Board) {
+    return board.getPiece(new Square(row, col))?.player === this.player
+  }
+
+  isSteppingOnEnemyPiece(row: number, col: number, board: Board) {
+    return board.getPiece(new Square(row, col)) && board.getPiece(new Square(row, col))?.player !== this.player
   }
 
   isCoordinateValid(row: number, col: number, board: Board) {
@@ -61,14 +95,14 @@ export class Piece {
       return false
     }
 
-    if (this.isSteppingOnPiece(row, col, board)) {
+    if (this.isSteppingOnFriendlyPiece(row, col, board)) {
       return false
     }
 
     return true
   }
 
-  getMoveIfValid(currentSquare: Square, rowDelta:number, colDelta:number) {
+  getMoveIfValid(currentSquare: Square, rowDelta: number, colDelta: number) {
     let newRow = currentSquare.row + rowDelta
     let newCol = currentSquare.col + colDelta
 
