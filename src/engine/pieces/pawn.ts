@@ -17,11 +17,19 @@ export class Pawn extends Piece {
       delta = 1;
     }
 
+    if(this.blockMovement(_board, currentSquare, delta)) {
+      return []
+    }
+
     moves.push(Square.at(currentSquare.row + delta, currentSquare.col));
-    if(!this.moved) {
+    if(!this.moved && !_board.getPiece(Square.at(currentSquare.row + 2*delta, currentSquare.col))) {
       moves.push(Square.at(currentSquare.row + 2 *delta, currentSquare.col));
     }
 
     return moves;
+  }
+
+  blockMovement(_board:Board, currentSquare:Square, delta:number) {
+    return !!_board.getPiece(Square.at(currentSquare.row + delta, currentSquare.col));
   }
 }
