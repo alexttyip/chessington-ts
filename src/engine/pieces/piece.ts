@@ -10,6 +10,10 @@ export function isKing(piece: Piece | undefined) {
   return piece?.constructor.name === 'King'
 }
 
+export function canMoveTo(playerPiece: Piece | undefined, testPiece: Piece | undefined) : boolean {
+  return !isKing(testPiece) && playerPiece?.player !== testPiece?.player
+}
+
 export function exploreSides(location: Square, board: Board, locationChanges: number[][]) {
   const piece = board.getPiece(location)
   let possibleMoves = []
@@ -17,7 +21,7 @@ export function exploreSides(location: Square, board: Board, locationChanges: nu
     for(let steps = 1; steps < gameSettings.BOARD_SIZE; steps++) {
       let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps)
       if(!board.notOccupiedOrOutOfBounds(newLocation)) {
-        if (board.isInBoard(newLocation) && board.getPiece(newLocation)?.player !== piece?.player && !isKing(board.getPiece(newLocation))) {
+        if (board.isInBoard(newLocation) && canMoveTo(board.getPiece(location), board.getPiece(newLocation))) {
           possibleMoves.push(newLocation)
         }
         break
