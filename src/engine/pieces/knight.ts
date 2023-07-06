@@ -2,6 +2,7 @@ import Board from '../board'
 import Player from '../player'
 import { Piece } from './piece'
 import Square from '../square'
+import { King } from './king'
 
 export class Knight extends Piece {
   constructor(player: Player) {
@@ -20,15 +21,22 @@ export class Knight extends Piece {
       let offset = 3 - Math.abs(row - currentSquare.row);
 
       let col = currentSquare.col + offset;
-      if(col >= 0 && col < _board.board[row].length){
-        moves.push(Square.at(row, col));
-      }
+      Knight.addMove(_board, row, col, moves, this);
       col = currentSquare.col - offset;
-      if(col >= 0 && col < _board.board[row].length){
-        moves.push(Square.at(row, col));
-      }
+      Knight.addMove(_board, row, col, moves, this);
     }
 
     return moves;
+  }
+
+  static addMove(_board:Board, row:number, col:number, moves:Square[], piece:Piece){
+    let targetSquare = Square.at(row, col);
+    let potentialPiece = _board.getPiece(targetSquare);
+    if(!!potentialPiece && (potentialPiece.player === piece.player || potentialPiece instanceof King)){
+      return;
+    }
+    if(col >= 0 && col < _board.board[row].length){
+      moves.push(Square.at(row, col));
+    }
   }
 }
