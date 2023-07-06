@@ -11,12 +11,20 @@ export class Pawn extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     try {
       let location = _board.findPiece(this)
+      let possibleMoves = []
       if(this.player === Player.WHITE) {
-        return [Square.at(location.row + 1, location.col)]
+        possibleMoves.push(Square.at(location.row + 1, location.col))
+        if (location.row === 1) {
+          possibleMoves.push(Square.at(location.row + 2, location.col))
+        }
       }
       else {
-        return [Square.at(location.row - 1, location.col)]
+        possibleMoves.push(Square.at(location.row - 1, location.col))
+        if (location.row === 6) {
+          possibleMoves.push(Square.at(location.row -2, location.col))
+        }
       }
+      return possibleMoves
     }
     catch (e) {
       return [] as Square[]
