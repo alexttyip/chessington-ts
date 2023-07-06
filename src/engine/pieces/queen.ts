@@ -11,9 +11,7 @@ export class Queen extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    let currentSquare = _board.findPiece(this);
-
-    let moves = Bishop.getMoves(_board, currentSquare)
+    let moves = Bishop.getMoves(_board, this)
     moves = moves.concat(Rook.getMoves(_board, this));
 
     return moves;
