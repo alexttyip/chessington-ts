@@ -23,12 +23,12 @@ export class Bishop extends Piece {
       let offset = row - currentSquare.row;
 
       let colToFind = currentSquare.col + offset;
-      if (colToFind >= 0 && colToFind < _board.board.length) {
+      if (colToFind >= 0 && colToFind < _board.board[row].length) {
         moves.push(Square.at(row, colToFind));
       }
 
       colToFind = currentSquare.col - offset;
-      if (colToFind >= 0 && colToFind < _board.board.length) {
+      if (colToFind >= 0 && colToFind < _board.board[row].length) {
         moves.push(Square.at(row, colToFind));
       }
     }

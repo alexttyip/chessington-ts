@@ -22,7 +22,7 @@ export class Rook extends Piece {
       }
     }
 
-    for(let col = 0; col < _board.board.length; col++) {
+    for(let col = 0; col < _board.board[0].length; col++) {
       if(col !== currentSquare.col){
         moves.push(Square.at(currentSquare.row, col));
       }
