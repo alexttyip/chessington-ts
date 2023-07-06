@@ -8,6 +8,7 @@ export default class Board {
   board: (Piece | undefined)[][]
 
   constructor(currentPlayer?: symbol) {
+
     this.currentPlayer = currentPlayer || Player.WHITE
     this.board = this.createBoard()
   }
@@ -57,6 +58,10 @@ export default class Board {
       return false
     }
     return true
+  }
+
+  notOccupiedOrOutOfBounds(squareLocation: Square) : boolean {
+    return this.isInBoard(squareLocation) && !this.getPiece(squareLocation)
   }
 }
 

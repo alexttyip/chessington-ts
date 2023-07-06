@@ -27,6 +27,7 @@ class Square {
 
 class Board {
     constructor(currentPlayer) {
+        console.log('is false');
         this.currentPlayer = currentPlayer || Player.WHITE;
         this.board = this.createBoard();
     }
@@ -62,8 +63,52 @@ class Board {
                 this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE;
         }
     }
+    isInBoard(squareLocation) {
+        if (squareLocation.row > GameSettings.BOARD_SIZE - 1 || squareLocation.row < 0) {
+            return false;
+        }
+        if (squareLocation.col > GameSettings.BOARD_SIZE - 1 || squareLocation.col < 0) {
+            return false;
+        }
+        return true;
+    }
+    notOccupiedOrOutOfBounds(squareLocation) {
+        return this.isInBoard(squareLocation) && this.getPiece(squareLocation) === undefined;
+    }
 }
 
+function diagonalMoves(location) {
+    let possibleMoves = [];
+    let sum = location.row + location.col;
+    let diff = location.row - location.col;
+    for (let i = 0; i < 8; i++) {
+        let newRow = i;
+        if (newRow === location.row) {
+            continue;
+        }
+        let newColumn = sum - newRow;
+        if (newColumn >= 0 && newColumn <= 7) {
+            possibleMoves.push(Square.at(newRow, newColumn));
+        }
+        newColumn = newRow - diff;
+        if (newColumn >= 0 && newColumn <= 7) {
+            possibleMoves.push(Square.at(newRow, newColumn));
+        }
+    }
+    return possibleMoves;
+}
+function lateralMoves(location) {
+    let possibleMoves = [];
+    for (let i = 0; i < 8; i++) {
+        if (i !== location.col) {
+            possibleMoves.push(Square.at(location.row, i));
+        }
+        if (i !== location.row) {
+            possibleMoves.push(Square.at(i, location.col));
+        }
+    }
+    return possibleMoves;
+}
 class Piece {
     constructor(player) {
         this.player = player;
@@ -82,7 +127,13 @@ class Bishop extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        try {
+            let location = _board.findPiece(this);
+            return diagonalMoves(location);
+        }
+        catch (e) {
+            return [];
+        }
     }
 }
 
@@ -91,7 +142,21 @@ class King extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        try {
+            let location = _board.findPiece(this);
+            let possibleMoves = [];
+            let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]];
+            for (let change of possibleChanges) {
+                let newLocation = Square.at(location.row + change[0], location.col + change[1]);
+                if (_board.isInBoard(newLocation)) {
+                    possibleMoves.push(newLocation);
+                }
+            }
+            return possibleMoves;
+        }
+        catch (e) {
+            return [];
+        }
     }
 }
 
@@ -100,7 +165,21 @@ class Knight extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        try {
+            let location = _board.findPiece(this);
+            let possibleMoves = [];
+            let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]];
+            for (let change of possibleChanges) {
+                let newLocation = Square.at(location.row + change[0], location.col + change[1]);
+                if (_board.isInBoard(newLocation)) {
+                    possibleMoves.push(newLocation);
+                }
+            }
+            return possibleMoves;
+        }
+        catch (e) {
+            return [];
+        }
     }
 }
 
@@ -124,7 +203,7 @@ class Pawn extends Piece {
                     possibleMoves.push(Square.at(location.row - 2, location.col));
                 }
             }
-            return possibleMoves;
+            return possibleMoves.filter(_board.isInBoard);
         }
         catch (e) {
             return [];
@@ -137,7 +216,13 @@ class Queen extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        try {
+            let location = _board.findPiece(this);
+            return lateralMoves(location).concat(diagonalMoves((location)));
+        }
+        catch (e) {
+            return [];
+        }
     }
 }
 
@@ -146,7 +231,13 @@ class Rook extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        try {
+            let location = _board.findPiece(this);
+            return lateralMoves(location);
+        }
+        catch (e) {
+            return [];
+        }
     }
 }
 

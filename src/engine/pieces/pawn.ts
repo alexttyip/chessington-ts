@@ -14,17 +14,24 @@ export class Pawn extends Piece {
       let possibleMoves = []
       if(this.player === Player.WHITE) {
         possibleMoves.push(Square.at(location.row + 1, location.col))
-        if (location.row === 1) {
+        if (location.row === 1 && !_board.getPiece(Square.at(location.row + 1, location.col))) {
           possibleMoves.push(Square.at(location.row + 2, location.col))
         }
       }
       else {
         possibleMoves.push(Square.at(location.row - 1, location.col))
-        if (location.row === 6) {
+        if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
           possibleMoves.push(Square.at(location.row -2, location.col))
         }
       }
-      return possibleMoves.filter(_board.isInBoard)
+
+      let filteredPossibleMoves = []
+      for (let move of possibleMoves) {
+        if (_board.notOccupiedOrOutOfBounds(move)) {
+          filteredPossibleMoves.push(move);
+        }
+      }
+      return filteredPossibleMoves
     }
     catch (e) {
       return [] as Square[]
