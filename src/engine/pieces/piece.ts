@@ -19,4 +19,34 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     board.movePiece(currentSquare, newSquare)
   }
+
+  static getMoveStatus(_board: Board, piece: Piece, newRow: number, newCol: number) {
+    if (!Piece.isOnBoard(_board, newRow, newCol)) {
+      return SquareStatus.UNREACHABLE;
+    }
+
+    let potentialBlock = _board.getPiece(Square.at(newRow, newCol))
+    if (potentialBlock !== undefined) {
+      if (potentialBlock.player !== piece.player && !potentialBlock.isKing()) {
+        return SquareStatus.CAPTURABLE;
+      }
+      return SquareStatus.UNREACHABLE;
+    }
+
+    return SquareStatus.EMPTY;
+  }
+
+  static isOnBoard(_board:Board, row: number, col: number) {
+    return 0 <= row &&row < _board.board.length &&0 <= col && col < _board.board[row].length
+  }
+
+  isKing() {
+    return false;
+  }
 }
+
+export enum SquareStatus {
+  CAPTURABLE,
+  UNREACHABLE,
+  EMPTY
+};

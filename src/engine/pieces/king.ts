@@ -29,4 +29,8 @@ export class King extends Piece {
     }
     return moves;
   }
+
+  isKing() {
+    return true;
+  }
 }
