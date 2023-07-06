@@ -10,17 +10,13 @@ export class Pawn extends Piece {
 
   checkPossiblePath(_board: Board, currentSquare: Square, rowDelta: number) {
     const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col)
-    if (rowDelta === 2) {
-      const adjacentPosition = new Square(currentSquare.row + 1, currentSquare.col)
-      if (_board.getPiece(newPosition) === undefined && _board.getPiece(adjacentPosition) === undefined) {
-        return [newPosition]
+    if (rowDelta === 2 || rowDelta === -2) {
+      const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col)
+      if (_board.getPiece(adjacentPosition) !== undefined) {
+        return []
       }
-    } else if (rowDelta === -2) {
-      const adjacentPosition = new Square(currentSquare.row - 1, currentSquare.col)
-      if (_board.getPiece(newPosition) === undefined && _board.getPiece(adjacentPosition) === undefined) {
-        return [newPosition]
-      }
-    } else if (_board.getPiece(newPosition) === undefined) {
+    }
+    if (_board.getPiece(newPosition) === undefined) {
       return [newPosition]
     }
     return []
@@ -29,15 +25,15 @@ export class Pawn extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
     let availableMoves: Square[] = []
-    let modifier
+    let direction
     if (this.player === Player.WHITE) {
-      modifier = 1
+      direction = 1
     } else {
-      modifier = -1
+      direction = -1
     }
-    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1 * modifier))
+    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 1 * direction))
     if (currentSquare.row === 1 || currentSquare.row === 6) {
-      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * modifier))
+      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * direction))
     }
     return availableMoves
   }
