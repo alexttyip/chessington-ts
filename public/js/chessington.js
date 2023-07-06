@@ -109,7 +109,15 @@ class Pawn extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        return [];
+        const currentSquare = _board.findPiece(this);
+        let availableMoves = [];
+        if (this.player === Player.WHITE) {
+            availableMoves.push(new Square(currentSquare.row + 1, currentSquare.col));
+        }
+        else {
+            availableMoves.push(new Square(currentSquare.row - 1, currentSquare.col));
+        }
+        return availableMoves;
     }
 }
 
@@ -177,7 +185,7 @@ function boardToPositionObject() {
     return position;
 }
 function onDragStart(_source, piece, _position, _orientation) {
-    return ((board.currentPlayer === Player.WHITE && piece.search(/^b/) !== -1) ||
+    return ((board.currentPlayer === Player.WHITE && piece.search(/^w/) !== -1) ||
         (board.currentPlayer === Player.BLACK && piece.search(/^b/) !== -1));
 }
 function onDrop(source, target) {

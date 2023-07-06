@@ -10,7 +10,12 @@ export class Pawn extends Piece {
 
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
-    const oneSquareUp = new Square(currentSquare.row+1, currentSquare.col)
-    return [oneSquareUp] as Square[]
+    let availableMoves = []
+    if (this.player === Player.WHITE) {
+      availableMoves.push(new Square(currentSquare.row + 1, currentSquare.col))
+    } else {
+      availableMoves.push(new Square(currentSquare.row-1, currentSquare.col))
+    }
+    return availableMoves as Square[]
   }
 }
