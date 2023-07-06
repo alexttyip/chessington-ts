@@ -15,6 +15,13 @@ export class King extends Piece {
         if(row === currentSquare.row && col === currentSquare.col) {
           continue;
         }
+        if(row < 0 || row >= _board.board.length || col < 0 || col >= _board.board[row].length){
+          continue
+        }
+        let potentialPiece = _board.getPiece(Square.at(row, col));
+        if(!!potentialPiece && (potentialPiece.player === this.player || potentialPiece instanceof King)) {
+          continue;
+        }
         moves.push(Square.at(row, col));
       }
     }
