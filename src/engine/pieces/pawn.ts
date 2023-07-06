@@ -24,7 +24,7 @@ export class Pawn extends Piece {
           possibleMoves.push(Square.at(location.row -2, location.col))
         }
       }
-      return possibleMoves
+      return possibleMoves.filter(_board.isInBoard)
     }
     catch (e) {
       return [] as Square[]
