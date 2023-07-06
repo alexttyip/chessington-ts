@@ -8,7 +8,30 @@ export class Knight extends Piece {
     super(player)
   }
 
+  getMoveIfValid(currentSquare: Square, rowDelta:number, colDelta:number) {
+    let newRow = currentSquare.row + rowDelta
+    let newCol = currentSquare.col + colDelta
+
+    if (this.isCoordinateValid(newRow, newCol)) {
+      return [new Square(newRow, newCol)]
+    } else {
+      return []
+    }
+  }
+
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+    const currentSquare = _board.findPiece(this)
+    let availableMoves: Square[] = []
+
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 2, 1))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 2, -1))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -2, 1))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -2, -1))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 1, 2))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -1, 2))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, 1, -2))
+    availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, -1, -2))
+
+    return availableMoves
   }
 }
