@@ -79,7 +79,8 @@ export class Piece {
     }
   }
 
-  getDiagonalMoves(currentSquare: Square, board: Board) {
+  getDiagonalMoves(board: Board) {
+    const currentSquare = board.findPiece(this)
     let availableMoves = []
 
     for (let i = 1; i < 8; i++) {
