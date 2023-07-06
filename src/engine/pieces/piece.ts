@@ -52,8 +52,8 @@ export class Piece {
     return !(Math.max(row, col) < 8 && Math.min(row, col) >= 0)
   }
 
-  isSteppingOnFriendlyPiece(row: number, col: number, board: Board) {
-    return board.getPiece(new Square(row, col))?.player === this.player
+  isSteppingOnPiece(row: number, col: number, board: Board) {
+    return board.getPiece(new Square(row, col)) !== undefined
   }
 
   isCoordinateValid(row: number, col: number, board: Board) {
@@ -61,7 +61,7 @@ export class Piece {
       return false
     }
 
-    if (this.isSteppingOnFriendlyPiece(row, col, board)) {
+    if (this.isSteppingOnPiece(row, col, board)) {
       return false
     }
 
