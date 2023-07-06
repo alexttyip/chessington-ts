@@ -1,6 +1,6 @@
 import Board from '../board'
 import Player from '../player'
-import { Piece } from './piece'
+import { diagonalMoves, lateralMoves, Piece } from './piece'
 import Square from '../square'
 
 export class Queen extends Piece {
@@ -9,6 +9,12 @@ export class Queen extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+    try {
+      let location = _board.findPiece(this)
+      return lateralMoves(location).concat(diagonalMoves((location)))
+    }
+    catch (e) {
+      return [] as Square[]
+    }
   }
 }
