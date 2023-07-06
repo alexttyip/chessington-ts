@@ -16,7 +16,6 @@ export class Piece {
     let hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
-
       if (!this.isCoordinateValid(newRow, currentSquare.col, board)) {
         break
       }
@@ -90,6 +89,10 @@ export class Piece {
     return board.getPiece(new Square(row, col)) && board.getPiece(new Square(row, col))?.player !== this.player
   }
 
+  isSteppingOnEnemyKing(row: number, col: number, board: Board) {
+    return board.getPiece(new Square(row, col))?.constructor.name === 'King'
+  }
+
   isCoordinateValid(row: number, col: number, board: Board) {
     if (this.isCoordinateOutOfBound(row, col)) {
       return false
@@ -98,6 +101,12 @@ export class Piece {
     if (this.isSteppingOnFriendlyPiece(row, col, board)) {
       return false
     }
+
+    if (this.isSteppingOnEnemyKing(row, col, board)) {
+      return false
+    }
+
+    if (this)
 
     return true
   }
@@ -117,38 +126,66 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     let availableMoves = []
 
+    let hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col + i
       if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
+        hitEnemyYet = true
+      }
       availableMoves.push(new Square(newRow, newCol))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col + i
       if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
+        hitEnemyYet = true
+      }
       availableMoves.push(new Square(newRow, newCol))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row - i
       let newCol = currentSquare.col - i
       if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
       }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
+        hitEnemyYet = true
+      }
       availableMoves.push(new Square(newRow, newCol))
     }
 
+    hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
       let newRow = currentSquare.row + i
       let newCol = currentSquare.col - i
       if (!this.isCoordinateValid(newRow, newCol, board)) {
         break
+      }
+      if (hitEnemyYet) {
+        break
+      }
+      if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
+        hitEnemyYet = true
       }
       availableMoves.push(new Square(newRow, newCol))
     }
