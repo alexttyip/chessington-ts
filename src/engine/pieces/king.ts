@@ -8,15 +8,9 @@ export class King extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    const currentSquare = _board.findPiece(this)
-    let availableMoves: Square[] = []
 
     const movesCombo = [[0,1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
 
-    movesCombo.forEach((combo: number[]) => {
-      availableMoves = availableMoves.concat(this.getMoveIfValid(_board, combo[0], combo[1]))
-    })
-
-    return availableMoves
+    return movesCombo.flatMap((combo: number[]) => this.getMoveIfValid(_board, combo[0], combo[1]))
   }
 }

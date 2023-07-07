@@ -68,67 +68,84 @@ class Piece {
     constructor(player) {
         this.player = player;
     }
-    getLateralMoves(currentSquare) {
+    goInADirectionAndReturnAvailableMoves(board, rowDelta, colDelta) {
+        const currentSquare = board.findPiece(this);
         let availableMoves = [];
-        for (let row = 0; row <= 7; row++) {
-            if (row !== currentSquare.row) {
-                availableMoves.push(new Square(row, currentSquare.col));
+        let hitEnemyYet = false;
+        for (let i = 1; i < 8; i++) {
+            let newRow = currentSquare.row + rowDelta * i;
+            let newCol = currentSquare.col + colDelta * i;
+            if (!this.isCoordinateValid(newRow, newCol, board)) {
+                break;
             }
-        }
-        for (let col = 0; col <= 7; col++) {
-            if (col !== currentSquare.col) {
-                availableMoves.push(new Square(currentSquare.row, col));
+            if (hitEnemyYet) {
+                break;
             }
+            if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
+                hitEnemyYet = true;
+            }
+            availableMoves.push(new Square(newRow, newCol));
         }
         return availableMoves;
     }
-    isCoordinateValid(row, col) {
-        return (Math.max(row, col) < 8 && Math.min(row, col) >= 0);
+    getLateralMoves(board) {
+        board.findPiece(this);
+        let availableMoves = [];
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 0));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 0));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, 1));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, -1));
+        return availableMoves;
     }
-    getMoveIfValid(currentSquare, rowDelta, colDelta) {
+    isCoordinateOutOfBound(row, col) {
+        return !(Math.max(row, col) < 8 && Math.min(row, col) >= 0);
+    }
+    isSteppingOnFriendlyPiece(row, col, board) {
+        var _a;
+        return ((_a = board.getPiece(new Square(row, col))) === null || _a === void 0 ? void 0 : _a.player) === this.player;
+    }
+    isSteppingOnEnemyPiece(row, col, board) {
+        var _a;
+        return board.getPiece(new Square(row, col)) && ((_a = board.getPiece(new Square(row, col))) === null || _a === void 0 ? void 0 : _a.player) !== this.player;
+    }
+    isSteppingOnEnemyKing(row, col, board) {
+        var _a;
+        return ((_a = board.getPiece(new Square(row, col))) === null || _a === void 0 ? void 0 : _a.constructor.name) === 'King';
+    }
+    isCoordinateValid(row, col, board) {
+        if (this.isCoordinateOutOfBound(row, col)) {
+            return false;
+        }
+        if (this.isSteppingOnFriendlyPiece(row, col, board)) {
+            return false;
+        }
+        if (this.isSteppingOnEnemyKing(row, col, board)) {
+            return false;
+        }
+        if (this)
+            return true;
+    }
+    getMoveIfValid(board, rowDelta, colDelta) {
+        const currentSquare = board.findPiece(this);
         let newRow = currentSquare.row + rowDelta;
         let newCol = currentSquare.col + colDelta;
-        if (this.isCoordinateValid(newRow, newCol)) {
-            return [new Square(newRow, newCol)];
-        }
-        else {
+        if (this.isCoordinateOutOfBound(newRow, newCol)) {
             return [];
         }
+        if (this.isSteppingOnFriendlyPiece(newRow, newCol, board)) {
+            return [];
+        }
+        if (this.isSteppingOnEnemyKing(newRow, newCol, board)) {
+            return [];
+        }
+        return [new Square(newRow, newCol)];
     }
-    getDiagonalMoves(currentSquare) {
+    getDiagonalMoves(board) {
         let availableMoves = [];
-        for (let i = 1; i < 8; i++) {
-            let newRow = currentSquare.row + i;
-            let newCol = currentSquare.col + i;
-            if (!this.isCoordinateValid(newRow, newCol)) {
-                break;
-            }
-            availableMoves.push(new Square(newRow, newCol));
-        }
-        for (let i = 1; i < 8; i++) {
-            let newRow = currentSquare.row - i;
-            let newCol = currentSquare.col + i;
-            if (!this.isCoordinateValid(newRow, newCol)) {
-                break;
-            }
-            availableMoves.push(new Square(newRow, newCol));
-        }
-        for (let i = 1; i < 8; i++) {
-            let newRow = currentSquare.row - i;
-            let newCol = currentSquare.col - i;
-            if (!this.isCoordinateValid(newRow, newCol)) {
-                break;
-            }
-            availableMoves.push(new Square(newRow, newCol));
-        }
-        for (let i = 1; i < 8; i++) {
-            let newRow = currentSquare.row + i;
-            let newCol = currentSquare.col - i;
-            if (!this.isCoordinateValid(newRow, newCol)) {
-                break;
-            }
-            availableMoves.push(new Square(newRow, newCol));
-        }
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 1));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 1));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, -1));
+        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, -1));
         return availableMoves;
     }
     getAvailableMoves(_board) {
@@ -145,8 +162,7 @@ class Bishop extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        const currentSquare = _board.findPiece(this);
-        return this.getDiagonalMoves(currentSquare);
+        return this.getDiagonalMoves(_board);
     }
 }
 
@@ -155,11 +171,11 @@ class King extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        const currentSquare = _board.findPiece(this);
+        _board.findPiece(this);
         let availableMoves = [];
         const movesCombo = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
         movesCombo.forEach((combo) => {
-            availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, combo[0], combo[1]));
+            availableMoves = availableMoves.concat(this.getMoveIfValid(_board, combo[0], combo[1]));
         });
         return availableMoves;
     }
@@ -170,11 +186,11 @@ class Knight extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        const currentSquare = _board.findPiece(this);
+        _board.findPiece(this);
         let availableMoves = [];
         const movesCombo = [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [-1, 2], [1, -2], [-1, -2]];
         movesCombo.forEach((combo) => {
-            availableMoves = availableMoves.concat(this.getMoveIfValid(currentSquare, combo[0], combo[1]));
+            availableMoves = availableMoves.concat(this.getMoveIfValid(_board, combo[0], combo[1]));
         });
         return availableMoves;
     }
@@ -184,21 +200,48 @@ class Pawn extends Piece {
     constructor(player) {
         super(player);
     }
+    checkPossiblePath(_board, currentSquare, rowDelta) {
+        const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col);
+        if (rowDelta === 2 || rowDelta === -2) {
+            const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col);
+            if (_board.getPiece(adjacentPosition) !== undefined) {
+                return [];
+            }
+        }
+        if (!this.isCoordinateOutOfBound(newPosition.row, newPosition.col) && _board.getPiece(newPosition) === undefined) {
+            return [newPosition];
+        }
+        return [];
+    }
+    takeDiagonalPiece(_board, direction) {
+        const currentSquare = _board.findPiece(this);
+        let possibleDiagonals = [];
+        let newRow = currentSquare.row + direction;
+        let newCol = currentSquare.col + 1;
+        if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
+            possibleDiagonals.push(new Square(newRow, newCol));
+        }
+        newCol = currentSquare.col - 1;
+        if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
+            possibleDiagonals.push(new Square(newRow, newCol));
+        }
+        return possibleDiagonals;
+    }
     getAvailableMoves(_board) {
         const currentSquare = _board.findPiece(this);
         let availableMoves = [];
+        let direction;
         if (this.player === Player.WHITE) {
-            availableMoves.push(new Square(currentSquare.row + 1, currentSquare.col));
-            if (currentSquare.row === 1) {
-                availableMoves.push(new Square(currentSquare.row + 2, currentSquare.col));
-            }
+            direction = 1;
         }
         else {
-            availableMoves.push(new Square(currentSquare.row - 1, currentSquare.col));
-            if (currentSquare.row === 6) {
-                availableMoves.push(new Square(currentSquare.row - 2, currentSquare.col));
-            }
+            direction = -1;
         }
+        availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, direction));
+        if (currentSquare.row === 1 || currentSquare.row === 6) {
+            availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * direction));
+        }
+        availableMoves = availableMoves.concat(this.takeDiagonalPiece(_board, direction));
         return availableMoves;
     }
 }
@@ -208,9 +251,8 @@ class Queen extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        const currentSquare = _board.findPiece(this);
-        const lateralMoves = this.getLateralMoves(currentSquare);
-        const diagonalMoves = this.getDiagonalMoves(currentSquare);
+        const lateralMoves = this.getLateralMoves(_board);
+        const diagonalMoves = this.getDiagonalMoves(_board);
         return lateralMoves.concat(diagonalMoves);
     }
 }
@@ -220,8 +262,7 @@ class Rook extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        const currentSquare = _board.findPiece(this);
-        return this.getLateralMoves(currentSquare);
+        return this.getLateralMoves(_board);
     }
 }
 
