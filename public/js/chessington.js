@@ -87,12 +87,12 @@ function canCapture(playerLocation, testLocation, board) {
     const playerPiece = board.getPiece(playerLocation);
     return !isKing(testPiece) && (playerPiece === null || playerPiece === void 0 ? void 0 : playerPiece.player) !== (testPiece === null || testPiece === void 0 ? void 0 : testPiece.player);
 }
-function exploreSides(location, board, locationChanges) {
+function findTargetsOrEdgesByDirection(location, board, directions) {
     board.getPiece(location);
     let possibleMoves = [];
-    for (let locationChange of locationChanges) {
+    for (let direction of directions) {
         for (let steps = 1; steps < GameSettings.BOARD_SIZE; steps++) {
-            let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps);
+            let newLocation = Square.at(location.row + direction[0] * steps, location.col + direction[1] * steps);
             if (!board.notOccupiedOrOutOfBounds(newLocation)) {
                 if (canCapture(location, newLocation, board)) {
                     possibleMoves.push(newLocation);
@@ -106,11 +106,11 @@ function exploreSides(location, board, locationChanges) {
 }
 function diagonalMoves(location, board) {
     let locationChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
-    return exploreSides(location, board, locationChanges);
+    return findTargetsOrEdgesByDirection(location, board, locationChanges);
 }
 function lateralMoves(location, board) {
     let locationChanges = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-    return exploreSides(location, board, locationChanges);
+    return findTargetsOrEdgesByDirection(location, board, locationChanges);
 }
 class Piece {
     constructor(player) {
@@ -145,21 +145,16 @@ class King extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            let possibleMoves = [];
-            let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]];
-            for (let change of possibleChanges) {
-                let newLocation = Square.at(location.row + change[0], location.col + change[1]);
-                if (canCapture(location, newLocation, _board)) {
-                    possibleMoves.push(newLocation);
-                }
+        let location = _board.findPiece(this);
+        let possibleMoves = [];
+        let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]];
+        for (let change of possibleChanges) {
+            let newLocation = Square.at(location.row + change[0], location.col + change[1]);
+            if (canCapture(location, newLocation, _board)) {
+                possibleMoves.push(newLocation);
             }
-            return possibleMoves;
         }
-        catch (e) {
-            return [];
-        }
+        return possibleMoves;
     }
 }
 
@@ -168,21 +163,16 @@ class Knight extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            let possibleMoves = [];
-            let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]];
-            for (let change of possibleChanges) {
-                let newLocation = Square.at(location.row + change[0], location.col + change[1]);
-                if (canCapture(location, newLocation, _board)) {
-                    possibleMoves.push(newLocation);
-                }
+        let location = _board.findPiece(this);
+        let possibleMoves = [];
+        let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]];
+        for (let change of possibleChanges) {
+            let newLocation = Square.at(location.row + change[0], location.col + change[1]);
+            if (canCapture(location, newLocation, _board)) {
+                possibleMoves.push(newLocation);
             }
-            return possibleMoves;
         }
-        catch (e) {
-            return [];
-        }
+        return possibleMoves;
     }
 }
 
@@ -190,50 +180,52 @@ class Pawn extends Piece {
     constructor(player) {
         super(player);
     }
+    pawnMove(location, _board) {
+        let possibleMoves = [];
+        if (this.player === Player.WHITE) {
+            possibleMoves.push(Square.at(location.row + 1, location.col));
+            if (location.row === 1 && !_board.getPiece(Square.at(location.row + 1, location.col))) {
+                possibleMoves.push(Square.at(location.row + 2, location.col));
+            }
+        }
+        else {
+            possibleMoves.push(Square.at(location.row - 1, location.col));
+            if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
+                possibleMoves.push(Square.at(location.row - 2, location.col));
+            }
+        }
+        return possibleMoves;
+    }
+    pawnCapture(location, possibleMoves, _board) {
+        if (this.player === Player.WHITE) {
+            let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)];
+            for (let newLocation of newLocations) {
+                if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
+                    possibleMoves.push(newLocation);
+                }
+            }
+        }
+        else {
+            let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)];
+            for (let newLocation of newLocations) {
+                if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
+                    possibleMoves.push(newLocation);
+                }
+            }
+        }
+    }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            let possibleMoves = [];
-            if (this.player === Player.WHITE) {
-                possibleMoves.push(Square.at(location.row + 1, location.col));
-                if (location.row === 1 && !_board.getPiece(Square.at(location.row + 1, location.col))) {
-                    possibleMoves.push(Square.at(location.row + 2, location.col));
-                }
+        let location = _board.findPiece(this);
+        let possibleMoves = this.pawnMove(location, _board);
+        let filteredPossibleMoves = [];
+        for (let move of possibleMoves) {
+            if (_board.notOccupiedOrOutOfBounds(move)) {
+                filteredPossibleMoves.push(move);
             }
-            else {
-                possibleMoves.push(Square.at(location.row - 1, location.col));
-                if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
-                    possibleMoves.push(Square.at(location.row - 2, location.col));
-                }
-            }
-            let filteredPossibleMoves = [];
-            for (let move of possibleMoves) {
-                if (_board.notOccupiedOrOutOfBounds(move)) {
-                    filteredPossibleMoves.push(move);
-                }
-            }
-            possibleMoves = filteredPossibleMoves;
-            if (this.player === Player.WHITE) {
-                let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)];
-                for (let newLocation of newLocations) {
-                    if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-                        possibleMoves.push(newLocation);
-                    }
-                }
-            }
-            else {
-                let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)];
-                for (let newLocation of newLocations) {
-                    if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-                        possibleMoves.push(newLocation);
-                    }
-                }
-            }
-            return possibleMoves;
         }
-        catch (e) {
-            return [];
-        }
+        possibleMoves = filteredPossibleMoves;
+        this.pawnCapture(location, possibleMoves, _board);
+        return possibleMoves;
     }
 }
 
@@ -242,13 +234,8 @@ class Queen extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            return lateralMoves(location, _board).concat(diagonalMoves(location, _board));
-        }
-        catch (e) {
-            return [];
-        }
+        let location = _board.findPiece(this);
+        return lateralMoves(location, _board).concat(diagonalMoves(location, _board));
     }
 }
 
@@ -257,13 +244,8 @@ class Rook extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            return lateralMoves(location, _board);
-        }
-        catch (e) {
-            return [];
-        }
+        let location = _board.findPiece(this);
+        return lateralMoves(location, _board);
     }
 }
 

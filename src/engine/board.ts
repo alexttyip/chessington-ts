@@ -2,15 +2,18 @@ import Player from './player'
 import GameSettings from './gameSettings'
 import Square from './square'
 import { Piece } from './pieces/piece'
+import { Pawn } from './pieces'
 
 export default class Board {
   currentPlayer: symbol
   board: (Piece | undefined)[][]
+  moveCount: number
 
   constructor(currentPlayer?: symbol) {
 
     this.currentPlayer = currentPlayer || Player.WHITE
     this.board = this.createBoard()
+    this.moveCount = 0
   }
 
   createBoard() {
@@ -43,6 +46,10 @@ export default class Board {
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+      this.moveCount++
+      if (movingPiece instanceof Pawn && typeof movingPiece.pawnFirstMove === 'undefined') {
+        movingPiece.pawnFirstMove = this.moveCount
+      }
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)
       this.currentPlayer =
@@ -63,5 +70,7 @@ export default class Board {
   notOccupiedOrOutOfBounds(squareLocation: Square) : boolean {
     return this.isInBoard(squareLocation) && !this.getPiece(squareLocation)
   }
+
+
 }
 

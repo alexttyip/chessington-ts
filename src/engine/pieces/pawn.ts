@@ -4,9 +4,13 @@ import { canCapture, Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
+  pawnFirstMove: number | undefined
   constructor(player: Player) {
     super(player)
+    this.pawnFirstMove = undefined
   }
+
+
 
   pawnMove(location: Square, _board: Board) {
     let possibleMoves = []
@@ -31,6 +35,9 @@ export class Pawn extends Piece {
         if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
           possibleMoves.push(newLocation)
         }
+        // if (_board.isInBoard(newLocation) && _board.getPiece(Square.at(newLocation.row - 1, newLocation.col)) instanceof Pawn) {
+        //   pass
+        // }
       }
     }
     else {
