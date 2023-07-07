@@ -14,7 +14,7 @@ export class Pawn extends Piece {
     if ((rowDelta === 2 || rowDelta === -2) && _board.getPiece(adjacentPosition)) {
       return []
     }
-    if (!this.isCoordinateOutOfBound(newPosition.row,newPosition.col) && !_board.getPiece(newPosition)) {
+    if (!this.isCoordinateOutOfBound(newPosition.row, newPosition.col) && !_board.getPiece(newPosition)) {
       return [newPosition]
     }
     return []
@@ -22,10 +22,10 @@ export class Pawn extends Piece {
 
   takeDiagonalPiece(_board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
-    let possibleDiagonals : Square[] = []
+    let possibleDiagonals: Square[] = []
     let newRow = currentSquare.row + direction
-    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col+1, _board))
-    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col-1, _board))
+    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col + 1, _board))
+    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col - 1, _board))
     return possibleDiagonals
   }
 
@@ -47,13 +47,23 @@ export class Pawn extends Piece {
 
   canEnPassantThisSquare(newRow: number, newCol: number, _board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
-    if (currentSquare.row === 3 || currentSquare.row === 4) {
-      let behindPiece = _board.getPiece(new Square(newRow-direction, newCol))
-      if (this.isAPawn(behindPiece) && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece?.numOfMoveMade === 1 && behindPiece?.wasMovedInTurn === _board.boardMoveNumber - 1) {
-        return true
-      }
+    if (currentSquare.row !== 3 && currentSquare.row !== 4) {
+      return false
     }
-    return false
+    let behindPiece = _board.getPiece(new Square(newRow - direction, newCol))
+    if (!this.isAPawn(behindPiece)) {
+      return false
+    }
+    if (!this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board)) {
+      return false
+    }
+    if (behindPiece?.numOfMoveMade !== 1) {
+      return false
+    }
+    if (behindPiece?.wasMovedInTurn !== _board.boardMoveNumber - 1) {
+      return false
+    }
+    return true
   }
 
   private isAPawn(behindPiece: Piece | undefined) {
