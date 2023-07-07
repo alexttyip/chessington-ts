@@ -8,7 +8,7 @@ export class Pawn extends Piece {
     super(player)
   }
 
-  checkPossiblePath(_board: Board, currentSquare: Square, rowDelta: number) {
+  returnMoveIfItIsPossible(_board: Board, currentSquare: Square, rowDelta: number) {
     const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col)
     if (rowDelta === 2 || rowDelta === -2) {
       const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col)
@@ -47,12 +47,12 @@ export class Pawn extends Piece {
     } else {
       direction = -1
     }
-    availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, direction))
+    availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, direction))
     if (currentSquare.row === 1 || currentSquare.row === 6) {
-      availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * direction))
+      availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, 2 * direction))
     }
 
-    availableMoves = availableMoves.concat(this.takeDiagonalPiece(_board, direction))
+    availableMoves.push(...this.takeDiagonalPiece(_board, direction))
     return availableMoves
   }
 }
