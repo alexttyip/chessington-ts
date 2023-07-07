@@ -2,7 +2,6 @@ import Player from './player'
 import GameSettings from './gameSettings'
 import Square from './square'
 import { Piece } from './pieces/piece'
-import player from './player'
 
 export default class Board {
   currentPlayer: symbol
