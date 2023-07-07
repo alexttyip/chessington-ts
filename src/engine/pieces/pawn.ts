@@ -4,9 +4,13 @@ import { Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
+  pawnFirstMove: number | undefined
   constructor(player: Player) {
     super(player)
+    this.pawnFirstMove = undefined
   }
+
+
 
   pawnCaptureCheck(pieceLocation: Square, newLocations: Square[], possibleMoves: Square[], _board: Board) : void {
     for (let newLocation of newLocations) {
