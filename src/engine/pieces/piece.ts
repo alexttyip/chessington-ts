@@ -4,7 +4,7 @@ import Square from '../square'
 
 export class Piece {
   player: symbol
-  numOfMove = 0
+  numOfMoveMade = 0
 
   constructor(player: Player) {
     this.player = player

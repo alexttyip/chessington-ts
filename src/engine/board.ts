@@ -42,7 +42,7 @@ export default class Board {
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
-      movingPiece.numOfMove += 1
+      movingPiece.numOfMoveMade += 1
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)
       this.currentPlayer =

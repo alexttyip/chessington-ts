@@ -56,7 +56,7 @@ class Board {
     movePiece(fromSquare, toSquare) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
-            movingPiece.numOfMove += 1;
+            movingPiece.numOfMoveMade += 1;
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer =
@@ -67,7 +67,7 @@ class Board {
 
 class Piece {
     constructor(player) {
-        this.numOfMove = 0;
+        this.numOfMoveMade = 0;
         this.player = player;
     }
     goInADirectionAndReturnAvailableMoves(board, rowDelta, colDelta) {
@@ -241,7 +241,7 @@ class Pawn extends Piece {
         const currentSquare = _board.findPiece(this);
         if (currentSquare.row === 3 || currentSquare.row === 4) {
             let behindPiece = _board.getPiece(new Square(newRow - direction, newCol));
-            if ((behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.constructor.name) === 'Pawn' && this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board) && behindPiece.numOfMove === 1) {
+            if ((behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.constructor.name) === 'Pawn' && this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board) && behindPiece.numOfMoveMade === 1) {
                 return true;
             }
         }

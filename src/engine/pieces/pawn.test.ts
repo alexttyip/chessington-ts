@@ -44,9 +44,9 @@ describe('Pawn', () => {
     it('move increment numOfMove', () => {
       const pawn = new Pawn(Player.WHITE)
       board.setPiece(Square.at(4, 4), pawn)
-      expect(pawn.numOfMove === 0)
+      expect(pawn.numOfMoveMade === 0)
       board.movePiece(Square.at(4, 4), Square.at(4, 6))
-      expect(board.getPiece(Square.at(4, 6))?.numOfMove === 1)
+      expect(board.getPiece(Square.at(4, 6))?.numOfMoveMade === 1)
     })
 
     it('can en passant', () => {
@@ -61,20 +61,6 @@ describe('Pawn', () => {
 
       expect(moves).toContainEqual(Square.at(5, 3))
     })
-
-    // it('en passant remove enemy piece', () => {
-    //   const pawn = new Pawn(Player.WHITE)
-    //   board.setPiece(Square.at(4, 4), pawn)
-    //   const blackPawn = new Pawn(Player.BLACK)
-    //   board.setPiece(Square.at(6, 3), blackPawn)
-    //   board.currentPlayer = Player.BLACK
-    //   board.movePiece(Square.at(6, 3), Square.at(4, 3))
-    //
-    //   const moves = pawn.getAvailableMoves(board)
-    //
-    //
-    //   expect(moves).toContainEqual(Square.at(5, 3))
-    // })
   })
 
   describe('black pawns', () => {
@@ -175,5 +161,25 @@ describe('Pawn', () => {
     const moves = pawn.getAvailableMoves(board)
 
     expect(moves).not.toContainEqual(Square.at(5, 3))
+  })
+
+  it('move increment numOfMove', () => {
+    const pawn = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(4, 4), pawn)
+    expect(pawn.numOfMoveMade === 0)
+    board.movePiece(Square.at(4, 4), Square.at(4, 6))
+    expect(board.getPiece(Square.at(4, 6))?.numOfMoveMade === 1)
+  })
+
+  it('can en passant', () => {
+    const pawn = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(3, 1), pawn)
+    const whitePawn = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(1, 0), whitePawn)
+    board.movePiece(Square.at(1, 0), Square.at(3, 0))
+
+    const moves = pawn.getAvailableMoves(board)
+
+    expect(moves).toContainEqual(Square.at(2, 0))
   })
 })
