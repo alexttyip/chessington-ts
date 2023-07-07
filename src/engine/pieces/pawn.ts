@@ -31,10 +31,33 @@ export class Pawn extends Piece {
     return possibleDiagonals
   }
 
-  private addMoveIfCanCapture(newRow: number, newCol: number, _board: Board, possibleDiagonals: Square[]) {
+  addMoveIfCanCapture(newRow: number, newCol: number, _board: Board, possibleDiagonals: Square[]) {
     if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
       possibleDiagonals.push(new Square(newRow, newCol))
     }
+  }
+
+  canEnPassantThisSquare(newRow: number, newCol: number, _board: Board, direction: number) {
+    const currentSquare = _board.findPiece(this)
+    if (currentSquare.row === 3 || currentSquare.row === 4) {
+      let behindLeftPiece = _board.getPiece(new Square(newRow-direction, newCol))
+      if (behindLeftPiece?.constructor.name === 'Pawn' && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindLeftPiece.numOfMove === 1) {
+        return true
+      }
+    }
+    return false
+  }
+
+  addEnPassantMoves(_board: Board, direction: number) {
+    const currentSquare = _board.findPiece(this)
+    let availableMoves: Square[] = []
+    if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col - 1, _board, direction)) {
+      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1))
+    }
+    if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col + 1, _board, direction)) {
+      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1))
+    }
+    return availableMoves
   }
 
   getAvailableMoves(_board: Board): Square[] {
@@ -46,6 +69,9 @@ export class Pawn extends Piece {
       availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, 2 * direction))
     }
     availableMoves.push(...this.takeDiagonalPiece(_board, direction))
+
+    availableMoves.push(...this.addEnPassantMoves(_board, direction))
+
     return availableMoves
   }
 }
