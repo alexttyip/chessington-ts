@@ -42,7 +42,7 @@ export class Piece {
 
     availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 0, -1))
 
-    return availableMoves as Square[]
+    return availableMoves
   }
 
   isCoordinateOutOfBound(row: number, col: number) {
