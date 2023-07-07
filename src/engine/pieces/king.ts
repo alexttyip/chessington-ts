@@ -7,7 +7,7 @@ export class King extends Piece {
     super(player)
   }
 
-  getAvailableMoves(_board: Board): Square[] {
+  getAvailableMoves(_board: Board): (Square)[] {
     let moves:Square[] = [];
     let currentSquare = _board.findPiece(this);
     for(let row = currentSquare.row - 1; row <= currentSquare.row + 1; row++) {

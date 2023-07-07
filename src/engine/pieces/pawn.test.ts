@@ -40,6 +40,72 @@ describe('Pawn', () => {
 
       expect(moves).toHaveLength(0)
     })
+    describe('en passant', () => {
+      it('can move en passant', () => {
+        // Given
+        const blackPawn = new Pawn(Player.BLACK);
+        const whitePawn = new Pawn(Player.WHITE);
+
+        board.setPiece(Square.at(6, 0), blackPawn);
+        board.setPiece(Square.at(4, 1), whitePawn);
+
+        board.currentPlayer = Player.BLACK;
+
+        //when
+        blackPawn.moveTo(board, Square.at(4, 0));
+
+        //then
+        expect(whitePawn.getAvailableMoves(board)).toContainEqual(Square.at(5, 0));
+      })
+      it('cannot move en passant freely', () => {
+        // Given
+        const blackPawn = new Pawn(Player.BLACK);
+        const whitePawn = new Pawn(Player.WHITE);
+        whitePawn.moved = true;
+
+        board.setPiece(Square.at(5, 0), blackPawn);
+        board.setPiece(Square.at(5, 1), whitePawn);
+
+        // Then
+        expect(whitePawn.getAvailableMoves(board)).not.toContainEqual(Square.at(5, 0));
+      })
+      it('cannot move en passant if black pawn has moved 1 space on first turn', () => {
+        // Given
+        const blackPawn = new Pawn(Player.BLACK);
+        const whitePawn = new Pawn(Player.WHITE);
+        whitePawn.moved = true;
+
+        board.setPiece(Square.at(6, 0), blackPawn);
+        board.setPiece(Square.at(5, 1), whitePawn);
+
+        board.currentPlayer = Player.BLACK;
+
+        // When
+        blackPawn.moveTo(board, Square.at(5, 0));
+
+        // Then
+        expect(whitePawn.getAvailableMoves(board)).not.toContainEqual(Square.at(5, 0));
+      })
+      it('cannot move en passant if missed first chance', () => {
+        // Given
+        const blackPawn = new Pawn(Player.BLACK);
+        const whitePawn = new Pawn(Player.WHITE);
+        const whitePawnExtra = new Pawn(Player.WHITE);
+
+        board.setPiece(Square.at(6, 0), blackPawn);
+        board.setPiece(Square.at(4, 1), whitePawn);
+        board.setPiece(Square.at(5, 3), whitePawnExtra);
+
+        board.currentPlayer = Player.BLACK;
+
+        //when
+        blackPawn.moveTo(board, Square.at(4, 0));
+        whitePawnExtra.moveTo(board, Square.at(6, 3));
+
+        //then
+        expect(whitePawn.getAvailableMoves(board)).not.toContainEqual(Square.at(5, 0));
+      })
+    })
   })
 
   describe('black pawns', () => {

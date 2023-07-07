@@ -4,11 +4,12 @@ import { Piece, SquareStatus } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
+  isPawn = true;
   constructor(player: Player) {
     super(player)
   }
 
-  getAvailableMoves(_board: Board): Square[] {
+  getAvailableMoves(_board: Board): (Square)[] {
     let currentSquare = _board.findPiece(this);
     let moves:Square[] = [];
     let delta = -1;
@@ -27,7 +28,9 @@ export class Pawn extends Piece {
     }
 
     [-1,1].forEach(direction=> {
-      if(this.checkDiagonal(_board, direction, delta, currentSquare)){
+      if(this.checkDiagonal(_board, direction, delta, currentSquare) === DiagonalPawnMove.CAPTURE){
+        moves.push(Square.at(currentSquare.row + delta, currentSquare.col + direction));
+      }else if(this.checkDiagonal(_board, direction, delta, currentSquare) === DiagonalPawnMove.ENPASSANT){
         moves.push(Square.at(currentSquare.row + delta, currentSquare.col + direction));
       }
 
@@ -36,10 +39,33 @@ export class Pawn extends Piece {
     return moves;
   }
 
-  checkDiagonal(_board: Board, direction:number, delta:number, currentSquare:Square) {
-    if(Piece.getMoveStatus(_board, this, currentSquare.row + delta, currentSquare.col + direction) === SquareStatus.CAPTURABLE){
-      return true;
+  moveTo(board: Board, newSquare: Square) {
+    let oldSquare = board.findPiece(this);
+    super.moveTo(board, newSquare);
+    if(Math.abs(oldSquare.row - newSquare.row) === 2){
+      this.vulnerableToEnPassant = true;
     }
-    return false;
   }
+
+  checkDiagonal(_board: Board, direction:number, delta:number, currentSquare:Square):DiagonalPawnMove {
+    if(Piece.getMoveStatus(_board, this, currentSquare.row + delta, currentSquare.col + direction) === SquareStatus.CAPTURABLE){
+      return DiagonalPawnMove.CAPTURE;
+    }
+
+    if(Piece.getMoveStatus(_board, this, currentSquare.row + delta, currentSquare.col + direction) === SquareStatus.EMPTY){
+      let adjacentSquare = Square.at(currentSquare.row, currentSquare.col + direction);
+      let pieceToEnPassant = _board.getPiece(adjacentSquare)
+      if(pieceToEnPassant instanceof Pawn && pieceToEnPassant.vulnerableToEnPassant) {
+        return DiagonalPawnMove.ENPASSANT;
+      }
+    }
+
+    return DiagonalPawnMove.UNREACHABLE;
+  }
+}
+
+enum DiagonalPawnMove {
+  CAPTURE,
+  ENPASSANT,
+  UNREACHABLE
 }

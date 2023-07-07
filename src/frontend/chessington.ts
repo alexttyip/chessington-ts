@@ -90,7 +90,7 @@ function onDrop(source: string, target: string) {
     !pieceToMove ||
     !pieceToMove
       .getAvailableMoves(board)
-      .some((square) => square.equals(toSquare))
+      .some((square) => !(square instanceof Square) || square.equals(toSquare))
   ) {
     return 'snapback'
   }

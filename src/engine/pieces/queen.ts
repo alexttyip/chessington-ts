@@ -8,7 +8,7 @@ export class Queen extends Piece {
     super(player)
   }
 
-  getAvailableMoves(_board:Board):Square[] {
+  getAvailableMoves(_board: Board):(Square)[] {
     let currentSquare = _board.findPiece(this);
 
     let directions = [
