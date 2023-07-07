@@ -8,13 +8,11 @@ export class Pawn extends Piece {
     super(player)
   }
 
-  returnMoveIfItIsPossible(_board: Board, currentSquare: Square, rowDelta: number) {
+  returnForwardMoveIfItIsPossible(_board: Board, currentSquare: Square, rowDelta: number) {
     const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col)
-    if (rowDelta === 2 || rowDelta === -2) {
-      const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col)
-      if (_board.getPiece(adjacentPosition) !== undefined) {
-        return []
-      }
+    const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col)
+    if ((rowDelta === 2 || rowDelta === -2) && _board.getPiece(adjacentPosition)) {
+      return []
     }
     if (!this.isCoordinateOutOfBound(newPosition.row,newPosition.col) && !_board.getPiece(newPosition)) {
       return [newPosition]
@@ -79,9 +77,9 @@ export class Pawn extends Piece {
     const currentSquare = _board.findPiece(this)
     let availableMoves: Square[] = []
     let direction = this.player === Player.WHITE ? 1 : -1
-    availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, direction))
+    availableMoves.push(...this.returnForwardMoveIfItIsPossible(_board, currentSquare, direction))
     if (currentSquare.row === 1 || currentSquare.row === 6) {
-      availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, 2 * direction))
+      availableMoves.push(...this.returnForwardMoveIfItIsPossible(_board, currentSquare, 2 * direction))
     }
     availableMoves.push(...this.takeDiagonalPiece(_board, direction))
 

@@ -6,7 +6,6 @@ export class Bishop extends Piece {
     super(player)
   }
 
-
   getAvailableMoves(_board: Board) {
     return this.getDiagonalMoves(_board)
   }
