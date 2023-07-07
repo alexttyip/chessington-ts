@@ -9,8 +9,6 @@ export class Queen extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    const lateralMoves = this.getLateralMoves(_board)
-    const diagonalMoves = this.getDiagonalMoves(_board)
-    return lateralMoves.concat(diagonalMoves)
+    return this.getLateralMoves(_board).concat(this.getDiagonalMoves(_board))
   }
 }

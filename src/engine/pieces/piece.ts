@@ -79,7 +79,7 @@ export class Piece {
     return true
   }
 
-  getMoveIfValid(board: Board, rowDelta: number, colDelta: number) {
+  getMoveIfLegal(board: Board, rowDelta: number, colDelta: number) {
 
     const currentSquare = board.findPiece(this)
     let newRow = currentSquare.row + rowDelta
@@ -92,7 +92,6 @@ export class Piece {
     if (this.isSteppingOnFriendlyPiece(newRow, newCol, board)) {
       return []
     }
-
     if (this.isSteppingOnEnemyKing(newRow, newCol, board)) {
       return []
     }
@@ -121,9 +120,13 @@ export class Piece {
     )
   }
 
+  isAPawn(piece: Piece | undefined) {
+    return piece?.constructor.name === 'Pawn'
+  }
+
   isMoveEnPassant(board: Board, newSquare: Square) {
     const currentSquare = board.findPiece(this)
-    return this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && !board.getPiece(newSquare);
+    return this.isAPawn(this) && currentSquare.col !== newSquare.col && !board.getPiece(newSquare);
 
   }
 

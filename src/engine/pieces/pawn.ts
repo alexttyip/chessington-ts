@@ -66,10 +66,6 @@ export class Pawn extends Piece {
     return true
   }
 
-  private isAPawn(behindPiece: Piece | undefined) {
-    return behindPiece?.constructor.name === 'Pawn'
-  }
-
   getEnPassantMoves(_board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
     return this.getEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col + 1, _board).concat(

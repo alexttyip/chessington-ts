@@ -11,6 +11,6 @@ export class Knight extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     const movesCombo = [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [-1, 2], [1, -2], [-1, -2]]
 
-    return movesCombo.flatMap(([rowDelta, colDelta]) => this.getMoveIfValid(_board, rowDelta, colDelta))
+    return movesCombo.flatMap(([rowDelta, colDelta]) => this.getMoveIfLegal(_board, rowDelta, colDelta))
   }
 }
