@@ -9,6 +9,6 @@ export class Rook extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+    return this.getLateralMoves(_board)
   }
 }
