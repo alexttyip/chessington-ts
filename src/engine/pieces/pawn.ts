@@ -70,13 +70,13 @@ export class Pawn extends Piece {
     return behindPiece?.constructor.name === 'Pawn'
   }
 
-  addEnPassantMoves(_board: Board, direction: number) {
+  getEnPassantMoves(_board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
-    return this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col + 1, _board).concat(
-      this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col - 1, _board))
+    return this.getEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col + 1, _board).concat(
+      this.getEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col - 1, _board))
   }
 
-  private addEnPassantMoveIfPossible(currentSquare: Square, direction: number, newCol1: number, _board: Board) {
+  private getEnPassantMoveIfPossible(currentSquare: Square, direction: number, newCol1: number, _board: Board) {
     if (this.canEnPassantThisSquare(currentSquare.row + direction, newCol1, _board, direction)) {
       return [new Square(currentSquare.row + direction, newCol1)]
     }
@@ -93,7 +93,7 @@ export class Pawn extends Piece {
     }
     availableMoves.push(...this.takeDiagonalPiece(_board, direction))
 
-    availableMoves.push(...this.addEnPassantMoves(_board, direction))
+    availableMoves.push(...this.getEnPassantMoves(_board, direction))
 
     return availableMoves
   }
