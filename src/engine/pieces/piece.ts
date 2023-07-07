@@ -19,7 +19,7 @@ export class Piece {
       }
       let newRow = currentSquare.row + rowDelta * i
       let newCol = currentSquare.col + colDelta * i
-      if (!this.isCoordinateValid(newRow, newCol, board)) {
+      if (!this.canItMoveOnTopOfThisSquare(newRow, newCol, board)) {
         break
       }
       if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
@@ -61,7 +61,7 @@ export class Piece {
     return board.getPiece(new Square(row, col))?.constructor.name === 'King'
   }
 
-  isCoordinateValid(row: number, col: number, board: Board) {
+  canItMoveOnTopOfThisSquare(row: number, col: number, board: Board) {
     if (this.isCoordinateOutOfBound(row, col)) {
       return false
     }
@@ -75,7 +75,6 @@ export class Piece {
     }
 
     if (this)
-
       return true
   }
 
