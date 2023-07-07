@@ -5,6 +5,7 @@ import Square from '../square'
 export class Piece {
   player: symbol
   numOfMoveMade = 0
+  wasMovedInTurn = -1
 
   constructor(player: Player) {
     this.player = player
@@ -96,7 +97,6 @@ export class Piece {
       return []
     }
 
-
     return [new Square(newRow, newCol)]
   }
 
@@ -123,10 +123,8 @@ export class Piece {
 
   isMoveEnPassant(board: Board, newSquare: Square) {
     const currentSquare = board.findPiece(this)
-    if (this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined) {
-      return true
-    }
-    return false
+    return this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined;
+
   }
 
   moveTo(board: Board, newSquare: Square) {

@@ -6,6 +6,7 @@ import { Piece } from './pieces/piece'
 export default class Board {
   currentPlayer: symbol
   board: (Piece | undefined)[][]
+  boardMoveNumber: number = 0
 
   constructor(currentPlayer?: symbol) {
     this.currentPlayer = currentPlayer || Player.WHITE
@@ -43,10 +44,12 @@ export default class Board {
     const movingPiece = this.getPiece(fromSquare)
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
       movingPiece.numOfMoveMade += 1
+      movingPiece.wasMovedInTurn = this.boardMoveNumber
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)
       this.currentPlayer =
         this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE
     }
+    this.boardMoveNumber += 1
   }
 }

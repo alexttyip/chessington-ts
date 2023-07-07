@@ -27,6 +27,7 @@ class Square {
 
 class Board {
     constructor(currentPlayer) {
+        this.boardMoveNumber = 0;
         this.currentPlayer = currentPlayer || Player.WHITE;
         this.board = this.createBoard();
     }
@@ -57,17 +58,20 @@ class Board {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
             movingPiece.numOfMoveMade += 1;
+            movingPiece.wasMovedInTurn = this.boardMoveNumber;
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer =
                 this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE;
         }
+        this.boardMoveNumber += 1;
     }
 }
 
 class Piece {
     constructor(player) {
         this.numOfMoveMade = 0;
+        this.wasMovedInTurn = -1;
         this.player = player;
     }
     goInADirectionAndReturnAvailableMoves(board, rowDelta, colDelta) {
@@ -154,10 +158,7 @@ class Piece {
     }
     isMoveEnPassant(board, newSquare) {
         const currentSquare = board.findPiece(this);
-        if (this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined) {
-            return true;
-        }
-        return false;
+        return this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined;
     }
     moveTo(board, newSquare) {
         const currentSquare = board.findPiece(this);
@@ -241,22 +242,24 @@ class Pawn extends Piece {
         const currentSquare = _board.findPiece(this);
         if (currentSquare.row === 3 || currentSquare.row === 4) {
             let behindPiece = _board.getPiece(new Square(newRow - direction, newCol));
-            if ((behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.constructor.name) === 'Pawn' && this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board) && behindPiece.numOfMoveMade === 1) {
+            if (this.isAPawn(behindPiece) && this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board) && (behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.numOfMoveMade) === 1 && (behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.wasMovedInTurn) === _board.boardMoveNumber - 1) {
                 return true;
             }
         }
         return false;
     }
+    isAPawn(behindPiece) {
+        return (behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.constructor.name) === 'Pawn';
+    }
     addEnPassantMoves(_board, direction) {
         const currentSquare = _board.findPiece(this);
-        let availableMoves = [];
-        if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col - 1, _board, direction)) {
-            availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1));
+        return this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col + 1, _board).concat(this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col - 1, _board));
+    }
+    addEnPassantMoveIfPossible(currentSquare, direction, newCol1, _board) {
+        if (this.canEnPassantThisSquare(currentSquare.row + direction, newCol1, _board, direction)) {
+            return [new Square(currentSquare.row + direction, newCol1)];
         }
-        if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col + 1, _board, direction)) {
-            availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col + 1));
-        }
-        return availableMoves;
+        return [];
     }
     getAvailableMoves(_board) {
         const currentSquare = _board.findPiece(this);

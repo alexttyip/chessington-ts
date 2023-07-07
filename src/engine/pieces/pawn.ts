@@ -41,7 +41,7 @@ export class Pawn extends Piece {
     const currentSquare = _board.findPiece(this)
     if (currentSquare.row === 3 || currentSquare.row === 4) {
       let behindPiece = _board.getPiece(new Square(newRow-direction, newCol))
-      if (this.isAPawn(behindPiece) && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece?.numOfMoveMade === 1) {
+      if (this.isAPawn(behindPiece) && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece?.numOfMoveMade === 1 && behindPiece?.wasMovedInTurn === _board.boardMoveNumber - 1) {
         return true
       }
     }
