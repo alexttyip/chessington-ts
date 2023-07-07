@@ -34,13 +34,13 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     let availableMoves: Square[] = []
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 0))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, 0))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 0))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, 0))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, 1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 0, 1))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, -1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 0, -1))
 
     return availableMoves as Square[]
   }
