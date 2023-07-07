@@ -72,6 +72,25 @@ describe('Pawn', () => {
       pawn.moveTo(board, Square.at(5, 3))
       expect(board.getPiece(Square.at(4, 3))).toEqual(undefined)
     })
+
+    it('cannot en passant if made another pawn', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(4, 4), pawn)
+      const anotherWhitePawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(0, 0), anotherWhitePawn)
+      const anotherBlackPawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(7, 0), anotherBlackPawn)
+      const blackPawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(6, 3), blackPawn)
+      board.currentPlayer = Player.BLACK
+      blackPawn.moveTo(board, Square.at(4, 3))
+      anotherWhitePawn.moveTo(board, Square.at(1, 0))
+      anotherBlackPawn.moveTo(board, Square.at(6, 0))
+
+      const moves = pawn.getAvailableMoves(board)
+
+      expect(moves).not.toContainEqual(Square.at(5, 3))
+    })
   })
 
   describe('black pawns', () => {
