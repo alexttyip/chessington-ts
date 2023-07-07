@@ -2,7 +2,7 @@ import Player from './player'
 import GameSettings from './gameSettings'
 import Square from './square'
 import { Piece } from './pieces/piece'
-import { Pawn } from './pieces'
+import {King, Pawn} from './pieces'
 
 export default class Board {
   currentPlayer: symbol
@@ -51,19 +51,24 @@ export default class Board {
     }
   }
 
+  moveCastling(movingPiece: Piece, fromSquare: Square, toSquare: Square) {
+    if (movingPiece instanceof King && Math.abs(fromSquare.col - toSquare.col) === 2) {
+      let rookCol = fromSquare.col - toSquare.col < 0 ? 7 : 0
+      let rookFrom = Square.at(fromSquare.row, rookCol)
+      let rookTo = Square.at(fromSquare.row, fromSquare.col + Math.sign(toSquare.col - fromSquare.col))
+      this.movePiece(rookFrom, rookTo)
+    }
+  }
+
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
 
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
-      // if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
-      //   let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1)
-      //   let targetLocation = Square.at(enPassantRow, toSquare.col)
-      //   this.setPiece(targetLocation, undefined)
-      // }
       this.moveEnPassant(movingPiece, fromSquare, toSquare)
+      this.moveCastling(movingPiece, fromSquare, toSquare)
       this.moveCount++
-      if (movingPiece instanceof Pawn && typeof movingPiece.pawnFirstMove === 'undefined') {
-        movingPiece.pawnFirstMove = this.moveCount
+      if (typeof movingPiece.firstMove === 'undefined') {
+        movingPiece.firstMove = this.moveCount
       }
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)

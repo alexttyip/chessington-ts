@@ -4,16 +4,15 @@ import { Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
-  pawnFirstMove: number | undefined
+
   constructor(player: Player) {
     super(player)
-    this.pawnFirstMove = undefined
   }
 
   checkEnPassant(newLocation: Square,  _board: Board, player: Player) : boolean {
     let enPassantRow = newLocation.row + (player === Player.WHITE ? -1 : 1)
     let possibleTarget = _board.getPiece(Square.at(enPassantRow, newLocation.col))
-    return possibleTarget instanceof Pawn && possibleTarget.pawnFirstMove === _board.moveCount
+    return possibleTarget instanceof Pawn && possibleTarget.firstMove === _board.moveCount
   }
 
   pawnCaptureCheck(pieceLocation: Square, newLocations: Square[], possibleMoves: Square[], _board: Board) : void {

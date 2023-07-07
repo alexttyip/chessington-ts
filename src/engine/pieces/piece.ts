@@ -9,8 +9,10 @@ import { King } from './king'
 
 export class Piece {
   player: symbol
+  firstMove: number | undefined
   constructor(player: Player) {
     this.player = player
+    this.firstMove = undefined
   }
 
   getAvailableMoves(_board: Board): Square[] {
