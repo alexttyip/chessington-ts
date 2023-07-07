@@ -11,6 +11,6 @@ export class King extends Piece {
 
     const movesCombo = [[0,1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
 
-    return movesCombo.flatMap((combo: number[]) => this.getMoveIfValid(_board, combo[0], combo[1]))
+    return movesCombo.flatMap(([rowDelta, colDelta]) => this.getMoveIfValid(_board, rowDelta, colDelta))
   }
 }
