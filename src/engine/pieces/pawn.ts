@@ -1,11 +1,19 @@
 import Board from '../board'
 import Player from '../player'
-import { canCapture, Piece } from './piece'
+import { Piece } from './piece'
 import Square from '../square'
 
 export class Pawn extends Piece {
   constructor(player: Player) {
     super(player)
+  }
+
+  pawnCaptureCheck(pieceLocation: Square, newLocations: Square[], possibleMoves: Square[], _board: Board) : void {
+    for (let newLocation of newLocations) {
+      if (Piece.canCapture(pieceLocation, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
+        possibleMoves.push(newLocation)
+      }
+    }
   }
 
   pawnMove(location: Square, _board: Board) {
@@ -27,19 +35,11 @@ export class Pawn extends Piece {
   pawnCapture(location: Square, possibleMoves: Square[], _board: Board) {
     if(this.player === Player.WHITE) {
       let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)]
-      for (let newLocation of newLocations) {
-        if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-          possibleMoves.push(newLocation)
-        }
-      }
+      this.pawnCaptureCheck(location, newLocations, possibleMoves, _board)
     }
     else {
       let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)]
-      for (let newLocation of newLocations) {
-        if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-          possibleMoves.push(newLocation)
-        }
-      }
+      this.pawnCaptureCheck(location, newLocations, possibleMoves, _board)
     }
   }
   getAvailableMoves(_board: Board): Square[] {
@@ -47,7 +47,7 @@ export class Pawn extends Piece {
       let possibleMoves = this.pawnMove(location, _board)
       let filteredPossibleMoves = []
       for (let move of possibleMoves) {
-        if (_board.notOccupiedOrOutOfBounds(move)) {
+        if (_board.isSquareWithinBoundsAndEmpty(move)) {
           filteredPossibleMoves.push(move);
         }
       }

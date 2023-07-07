@@ -60,7 +60,7 @@ export default class Board {
     return true
   }
 
-  notOccupiedOrOutOfBounds(squareLocation: Square) : boolean {
+  isSquareWithinBoundsAndEmpty(squareLocation: Square) : boolean {
     return this.isInBoard(squareLocation) && !this.getPiece(squareLocation)
   }
 }

@@ -1,5 +1,5 @@
 import Board from '../board'
-import { canCapture, Piece } from './piece'
+import { Piece } from './piece'
 import Square from '../square'
 
 
@@ -12,12 +12,14 @@ export class King extends Piece {
   getAvailableMoves(_board: Board): Square[] {
       let location = _board.findPiece(this)
       let possibleMoves = [];
-      let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]]
-      for (let change of possibleChanges) {
-        let newLocation = Square.at(location.row + change[0], location.col + change[1])
-        if (canCapture(location, newLocation, _board)) {
-          possibleMoves.push(newLocation)
+      for (let rowChange = -1; rowChange <= 1; rowChange++) {
+        for(let colChange = -1; colChange <= 1; colChange++) {
+            let newLocation = Square.at(location.row + rowChange, location.col + colChange)
+            if (Piece.canCapture(location, newLocation, _board)) {
+                possibleMoves.push(newLocation)
+            }
         }
+
       }
       return possibleMoves
   }

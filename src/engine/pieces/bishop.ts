@@ -1,5 +1,5 @@
 import Board from '../board'
-import { diagonalMoves, Piece } from './piece'
+import { Piece } from './piece'
 import Square from '../square'
 
 export class Bishop extends Piece {
@@ -10,7 +10,7 @@ export class Bishop extends Piece {
   getAvailableMoves(_board: Board) {
     try {
       let location = _board.findPiece(this)
-      return diagonalMoves(location, _board)
+      return Piece.diagonalMoves(location, _board)
     }
     catch (e) {
       return [] as Square[]
