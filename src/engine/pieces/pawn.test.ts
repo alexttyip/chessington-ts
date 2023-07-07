@@ -4,6 +4,7 @@ import Square from '../square'
 import { King } from './king'
 import { Pawn } from './pawn'
 import { Rook } from './rook'
+import {Queen} from "./queen";
 
 describe('Pawn', () => {
   let board: Board
@@ -53,6 +54,14 @@ describe('Pawn', () => {
 
       expect(moves).toContainEqual(Square.at(5, 2))
     })
+
+    it('can be promoted', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(6, 2), pawn)
+      board.movePiece(Square.at(6, 2), Square.at(7, 2))
+
+      expect(board.getPiece(Square.at(7, 2))).toBeInstanceOf(Queen)
+    })
   })
 
   describe('black pawns', () => {
@@ -101,6 +110,14 @@ describe('Pawn', () => {
       const moves = pawn.getAvailableMoves(board)
 
       expect(moves).toContainEqual(Square.at(2, 2))
+    })
+
+    it('can be promoted', () => {
+      const pawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(1, 0), pawn)
+      board.movePiece(Square.at(1, 0), Square.at(0, 0))
+
+      expect(board.getPiece(Square.at(0, 0))).toBeInstanceOf(Queen)
     })
   })
 

@@ -268,6 +268,12 @@ class Board {
             this.movePiece(rookFrom, rookTo);
         }
     }
+    pawnPromotion(movingPiece, toSquare) {
+        let promotionRow = (this.currentPlayer === Player.WHITE ? 7 : 0);
+        if (movingPiece instanceof Pawn && toSquare.row === promotionRow) {
+            this.setPiece(toSquare, new Queen(this.currentPlayer));
+        }
+    }
     movePiece(fromSquare, toSquare) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
@@ -279,6 +285,7 @@ class Board {
             }
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
+            this.pawnPromotion(movingPiece, toSquare);
             this.currentPlayer =
                 this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE;
         }

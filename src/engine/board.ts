@@ -2,7 +2,7 @@ import Player from './player'
 import GameSettings from './gameSettings'
 import Square from './square'
 import { Piece } from './pieces/piece'
-import {King, Pawn} from './pieces'
+import {King, Pawn, Queen} from './pieces'
 
 export default class Board {
   currentPlayer: symbol
@@ -60,6 +60,13 @@ export default class Board {
     }
   }
 
+  pawnPromotion(movingPiece: Piece, toSquare: Square) {
+    let promotionRow = (this.currentPlayer === Player.WHITE ? 7 : 0)
+    if (movingPiece instanceof Pawn && toSquare.row === promotionRow) {
+      this.setPiece(toSquare, new Queen(this.currentPlayer))
+    }
+  }
+
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
 
@@ -72,6 +79,7 @@ export default class Board {
       }
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)
+      this.pawnPromotion(movingPiece, toSquare)
       this.currentPlayer =
         this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE
     }
