@@ -41,23 +41,28 @@ export class Pawn extends Piece {
     const currentSquare = _board.findPiece(this)
     if (currentSquare.row === 3 || currentSquare.row === 4) {
       let behindPiece = _board.getPiece(new Square(newRow-direction, newCol))
-      if (behindPiece?.constructor.name === 'Pawn' && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece.numOfMoveMade === 1) {
+      if (this.isAPawn(behindPiece) && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece?.numOfMoveMade === 1) {
         return true
       }
     }
     return false
   }
 
+  private isAPawn(behindPiece: Piece | undefined) {
+    return behindPiece?.constructor.name === 'Pawn'
+  }
+
   addEnPassantMoves(_board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
-    let availableMoves: Square[] = []
-    if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col - 1, _board, direction)) {
-      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1))
+    return this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col + 1, _board).concat(
+      this.addEnPassantMoveIfPossible(currentSquare, direction, currentSquare.col - 1, _board))
+  }
+
+  private addEnPassantMoveIfPossible(currentSquare: Square, direction: number, newCol1: number, _board: Board) {
+    if (this.canEnPassantThisSquare(currentSquare.row + direction, newCol1, _board, direction)) {
+      return [new Square(currentSquare.row + direction, newCol1)]
     }
-    if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col + 1, _board, direction)) {
-      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col + 1))
-    }
-    return availableMoves
+    return []
   }
 
   getAvailableMoves(_board: Board): Square[] {
