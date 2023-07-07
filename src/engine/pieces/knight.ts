@@ -2,7 +2,6 @@ import Board from '../board'
 import Player from '../player'
 import { Piece, SquareStatus } from './piece'
 import Square from '../square'
-import { King } from './king'
 
 export class Knight extends Piece {
   constructor(player: Player) {
