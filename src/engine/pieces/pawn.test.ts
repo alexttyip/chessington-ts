@@ -40,6 +40,27 @@ describe('Pawn', () => {
 
       expect(moves).toHaveLength(0)
     })
+
+    it('move increment numOfMove', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(4, 4), pawn)
+      expect(pawn.numOfMove === 0)
+      board.movePiece(Square.at(4, 4), Square.at(4, 6))
+      expect(board.getPiece(Square.at(4, 6))?.numOfMove === 1)
+    })
+
+    it('can en passant', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(4, 4), pawn)
+      const blackPawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(6, 3), blackPawn)
+      board.currentPlayer = Player.BLACK
+      board.movePiece(Square.at(6, 3), Square.at(4, 3))
+
+      const moves = pawn.getAvailableMoves(board)
+
+      expect(moves).toContainEqual(Square.at(5, 3))
+    })
   })
 
   describe('black pawns', () => {

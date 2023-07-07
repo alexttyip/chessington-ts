@@ -40,8 +40,8 @@ export class Pawn extends Piece {
   canEnPassantThisSquare(newRow: number, newCol: number, _board: Board, direction: number) {
     const currentSquare = _board.findPiece(this)
     if (currentSquare.row === 3 || currentSquare.row === 4) {
-      let behindLeftPiece = _board.getPiece(new Square(newRow-direction, newCol))
-      if (behindLeftPiece?.constructor.name === 'Pawn' && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindLeftPiece.numOfMove === 1) {
+      let behindPiece = _board.getPiece(new Square(newRow-direction, newCol))
+      if (behindPiece?.constructor.name === 'Pawn' && this.isSteppingOnEnemyPiece(newRow-direction, newCol, _board) && behindPiece.numOfMove === 1) {
         return true
       }
     }
