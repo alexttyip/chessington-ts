@@ -1,6 +1,6 @@
 import Board from '../board'
 import Player from '../player'
-import { Piece } from './piece'
+import { Piece, SquareStatus } from './piece'
 import Square from '../square'
 import { King } from './king'
 
@@ -12,33 +12,30 @@ export class Knight extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     let moves: Square[] = [];
     let currentSquare = _board.findPiece(this);
-
-    for(let row = Math.max(0,currentSquare.row-2); row < Math.min(_board.board.length, currentSquare.row+3); row++) {
-      if(row === currentSquare.row){
-        continue;
+    for (let row = currentSquare.row - 2; row <= currentSquare.row + 2; row++) {
+      for (let col = currentSquare.col - 2; col <= currentSquare.col + 2; col++) {
+        if(!this.isValidKnightMove(row, col, currentSquare)) {
+          continue;
+        }
+        if (Piece.getMoveStatus(_board, this, row, col) !== SquareStatus.UNREACHABLE) {
+          moves.push(Square.at(row, col));
+        }
       }
-
-      let offset = 3 - Math.abs(row - currentSquare.row);
-
-      let col = currentSquare.col + offset;
-      Knight.addMove(_board, row, col, moves, this);
-      col = currentSquare.col - offset;
-      Knight.addMove(_board, row, col, moves, this);
     }
-
     return moves;
   }
 
-  static addMove(_board:Board, row:number, col:number, moves:Square[], piece:Piece){
-    let targetSquare = Square.at(row, col);
-    let potentialPiece = _board.getPiece(targetSquare);
+  isValidKnightMove(row:number, col:number, currentSquare:Square) {
+    let rowDifference = Math.abs(row - currentSquare.row);
+    let colDifference = Math.abs(col - currentSquare.col);
 
-    if(potentialPiece !== undefined && (potentialPiece.player === piece.player || potentialPiece instanceof King)){
-      return;
+    if(rowDifference === 1 && colDifference === 2) {
+      return true;
     }
-
-    if(col >= 0 && col < _board.board[row].length){
-      moves.push(Square.at(row, col));
+    if (rowDifference === 2 && colDifference === 1) {
+      return true;
     }
+    return false;
   }
+
 }
