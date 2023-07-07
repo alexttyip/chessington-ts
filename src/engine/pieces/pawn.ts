@@ -23,19 +23,18 @@ export class Pawn extends Piece {
   }
 
   takeDiagonalPiece(_board: Board, direction: number) {
-    // check row + direction, column + 1
     const currentSquare = _board.findPiece(this)
     let possibleDiagonals : Square[] = []
     let newRow = currentSquare.row + direction
-    let newCol = currentSquare.col+1
-    if (!this.isCoordinateOutOfBound(newRow,newCol) && this.isSteppingOnEnemyPiece(newRow,newCol,_board) && !this.isSteppingOnEnemyKing(newRow,newCol,_board)) {
-      possibleDiagonals.push(new Square(newRow,newCol))
-    }
-    newCol = currentSquare.col-1
-    if (!this.isCoordinateOutOfBound(newRow,newCol) && this.isSteppingOnEnemyPiece(newRow,newCol,_board) && !this.isSteppingOnEnemyKing(newRow,newCol,_board)) {
-      possibleDiagonals.push(new Square(newRow,newCol))
-    }
+    this.addMoveIfCanCapture(newRow, currentSquare.col+1, _board, possibleDiagonals)
+    this.addMoveIfCanCapture(newRow, currentSquare.col-1, _board, possibleDiagonals)
     return possibleDiagonals
+  }
+
+  private addMoveIfCanCapture(newRow: number, newCol: number, _board: Board, possibleDiagonals: Square[]) {
+    if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
+      possibleDiagonals.push(new Square(newRow, newCol))
+    }
   }
 
   getAvailableMoves(_board: Board): Square[] {
