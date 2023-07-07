@@ -121,8 +121,21 @@ export class Piece {
     )
   }
 
+  isMoveEnPassant(board: Board, newSquare: Square) {
+    const currentSquare = board.findPiece(this)
+    if (this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined) {
+      return true
+    }
+    return false
+  }
+
   moveTo(board: Board, newSquare: Square) {
     const currentSquare = board.findPiece(this)
+    if (this.isMoveEnPassant(board, newSquare)) {
+      if (this.player === Player.WHITE) {
+        board.setPiece(new Square(newSquare.row - 1, newSquare.col), undefined)
+      }
+    }
     board.movePiece(currentSquare, newSquare)
   }
 }

@@ -56,6 +56,7 @@ class Board {
     movePiece(fromSquare, toSquare) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+            movingPiece.numOfMove += 1;
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer =
@@ -66,6 +67,7 @@ class Board {
 
 class Piece {
     constructor(player) {
+        this.numOfMove = 0;
         this.player = player;
     }
     goInADirectionAndReturnAvailableMoves(board, rowDelta, colDelta) {
@@ -73,12 +75,12 @@ class Piece {
         let availableMoves = [];
         let hitEnemyYet = false;
         for (let i = 1; i < 8; i++) {
-            let newRow = currentSquare.row + rowDelta * i;
-            let newCol = currentSquare.col + colDelta * i;
-            if (!this.isCoordinateValid(newRow, newCol, board)) {
+            if (hitEnemyYet) {
                 break;
             }
-            if (hitEnemyYet) {
+            let newRow = currentSquare.row + rowDelta * i;
+            let newCol = currentSquare.col + colDelta * i;
+            if (!this.canItMoveOnTopOfThisSquare(newRow, newCol, board)) {
                 break;
             }
             if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
@@ -91,10 +93,10 @@ class Piece {
     getLateralMoves(board) {
         board.findPiece(this);
         let availableMoves = [];
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 0));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 0));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, 1));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 0, -1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, 0));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, 0));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 0, 1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 0, -1));
         return availableMoves;
     }
     isCoordinateOutOfBound(row, col) {
@@ -112,7 +114,7 @@ class Piece {
         var _a;
         return ((_a = board.getPiece(new Square(row, col))) === null || _a === void 0 ? void 0 : _a.constructor.name) === 'King';
     }
-    isCoordinateValid(row, col, board) {
+    canItMoveOnTopOfThisSquare(row, col, board) {
         if (this.isCoordinateOutOfBound(row, col)) {
             return false;
         }
@@ -122,8 +124,7 @@ class Piece {
         if (this.isSteppingOnEnemyKing(row, col, board)) {
             return false;
         }
-        if (this)
-            return true;
+        return true;
     }
     getMoveIfValid(board, rowDelta, colDelta) {
         const currentSquare = board.findPiece(this);
@@ -142,17 +143,29 @@ class Piece {
     }
     getDiagonalMoves(board) {
         let availableMoves = [];
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 1));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 1));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, -1));
-        availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, -1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, 1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, 1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, -1));
+        availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, -1));
         return availableMoves;
     }
     getAvailableMoves(_board) {
         throw new Error('This method must be implemented, and return a list of available moves');
     }
+    isMoveEnPassant(board, newSquare) {
+        const currentSquare = board.findPiece(this);
+        if (this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined) {
+            return true;
+        }
+        return false;
+    }
     moveTo(board, newSquare) {
         const currentSquare = board.findPiece(this);
+        if (this.isMoveEnPassant(board, newSquare)) {
+            if (this.player === Player.WHITE) {
+                board.setPiece(new Square(newSquare.row - 1, newSquare.col), undefined);
+            }
+        }
         board.movePiece(currentSquare, newSquare);
     }
 }
@@ -171,13 +184,8 @@ class King extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        _board.findPiece(this);
-        let availableMoves = [];
         const movesCombo = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
-        movesCombo.forEach((combo) => {
-            availableMoves = availableMoves.concat(this.getMoveIfValid(_board, combo[0], combo[1]));
-        });
-        return availableMoves;
+        return movesCombo.flatMap((combo) => this.getMoveIfValid(_board, combo[0], combo[1]));
     }
 }
 
@@ -200,7 +208,7 @@ class Pawn extends Piece {
     constructor(player) {
         super(player);
     }
-    checkPossiblePath(_board, currentSquare, rowDelta) {
+    returnMoveIfItIsPossible(_board, currentSquare, rowDelta) {
         const newPosition = new Square(currentSquare.row + rowDelta, currentSquare.col);
         if (rowDelta === 2 || rowDelta === -2) {
             const adjacentPosition = new Square(currentSquare.row + rowDelta / 2, currentSquare.col);
@@ -217,31 +225,46 @@ class Pawn extends Piece {
         const currentSquare = _board.findPiece(this);
         let possibleDiagonals = [];
         let newRow = currentSquare.row + direction;
-        let newCol = currentSquare.col + 1;
-        if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
-            possibleDiagonals.push(new Square(newRow, newCol));
-        }
-        newCol = currentSquare.col - 1;
-        if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
-            possibleDiagonals.push(new Square(newRow, newCol));
-        }
+        this.addMoveIfCanCapture(newRow, currentSquare.col + 1, _board, possibleDiagonals);
+        this.addMoveIfCanCapture(newRow, currentSquare.col - 1, _board, possibleDiagonals);
         return possibleDiagonals;
+    }
+    addMoveIfCanCapture(newRow, newCol, _board, possibleDiagonals) {
+        if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
+            possibleDiagonals.push(new Square(newRow, newCol));
+        }
+    }
+    canEnPassantThisSquare(newRow, newCol, _board, direction) {
+        const currentSquare = _board.findPiece(this);
+        if (currentSquare.row === 3 || currentSquare.row === 4) {
+            let behindPiece = _board.getPiece(new Square(newRow - direction, newCol));
+            if ((behindPiece === null || behindPiece === void 0 ? void 0 : behindPiece.constructor.name) === 'Pawn' && this.isSteppingOnEnemyPiece(newRow - direction, newCol, _board) && behindPiece.numOfMove === 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+    addEnPassantMoves(_board, direction) {
+        const currentSquare = _board.findPiece(this);
+        let availableMoves = [];
+        if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col - 1, _board, direction)) {
+            availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1));
+        }
+        if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col + 1, _board, direction)) {
+            availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1));
+        }
+        return availableMoves;
     }
     getAvailableMoves(_board) {
         const currentSquare = _board.findPiece(this);
         let availableMoves = [];
-        let direction;
-        if (this.player === Player.WHITE) {
-            direction = 1;
-        }
-        else {
-            direction = -1;
-        }
-        availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, direction));
+        let direction = this.player === Player.WHITE ? 1 : -1;
+        availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, direction));
         if (currentSquare.row === 1 || currentSquare.row === 6) {
-            availableMoves = availableMoves.concat(this.checkPossiblePath(_board, currentSquare, 2 * direction));
+            availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, 2 * direction));
         }
-        availableMoves = availableMoves.concat(this.takeDiagonalPiece(_board, direction));
+        availableMoves.push(...this.takeDiagonalPiece(_board, direction));
+        availableMoves.push(...this.addEnPassantMoves(_board, direction));
         return availableMoves;
     }
 }
