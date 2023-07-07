@@ -28,6 +28,7 @@ class Square {
 class Piece {
     constructor(player) {
         this.player = player;
+        this.firstMove = undefined;
     }
     getAvailableMoves(_board) {
         throw new Error('This method must be implemented, and return a list of available moves');
@@ -55,13 +56,16 @@ class Piece {
                 let newRow = location.row + direction[0] * steps;
                 let newCol = location.col + direction[1] * steps;
                 let newLocation = Square.at(newRow, newCol);
-                if (!board.isSquareWithinBoundsAndEmpty(newLocation)) {
-                    if (Piece.canCapture(location, newLocation, board)) {
-                        possibleMoves.push(newLocation);
-                    }
+                if (board.isSquareWithinBoundsAndEmpty(newLocation)) {
+                    possibleMoves.push(newLocation);
+                }
+                else if (Piece.canCapture(location, newLocation, board)) {
+                    possibleMoves.push(newLocation);
                     break;
                 }
-                possibleMoves.push(newLocation);
+                else {
+                    break;
+                }
             }
         }
         return possibleMoves;
@@ -81,19 +85,38 @@ class Bishop extends Piece {
         super(player);
     }
     getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            return Piece.diagonalMoves(location, _board);
-        }
-        catch (e) {
-            return [];
-        }
+        let location = _board.findPiece(this);
+        return Piece.diagonalMoves(location, _board);
+    }
+}
+
+class Rook extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        return Piece.lateralMoves(location, _board);
     }
 }
 
 class King extends Piece {
     constructor(player) {
         super(player);
+    }
+    canCastle(possibleRookLocation, board) {
+        let possibleRook = board.getPiece(possibleRookLocation);
+        if (possibleRook instanceof Rook && typeof possibleRook.firstMove === 'undefined') {
+            let leftBound = Math.min(possibleRookLocation.col, board.findPiece(this).col) + 1;
+            let rightBound = Math.max(possibleRookLocation.col, board.findPiece(this).col) - 1;
+            for (let col = leftBound; col <= rightBound; col++) {
+                if (board.getPiece(Square.at(possibleRookLocation.row, col))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
     getAvailableMoves(_board) {
         let location = _board.findPiece(this);
@@ -103,6 +126,15 @@ class King extends Piece {
                 let newLocation = Square.at(location.row + rowChange, location.col + colChange);
                 if (Piece.canCapture(location, newLocation, _board)) {
                     possibleMoves.push(newLocation);
+                }
+            }
+        }
+        if (typeof this.firstMove === 'undefined') {
+            let possibleRookLocations = [Square.at(location.row, 0), Square.at(location.row, 7)];
+            for (let possibleRookLocation of possibleRookLocations) {
+                if (this.canCastle(possibleRookLocation, _board)) {
+                    let columnDifference = Math.sign(possibleRookLocation.col - location.col);
+                    possibleMoves.push(Square.at(location.row, location.col + 2 * columnDifference));
                 }
             }
         }
@@ -131,12 +163,11 @@ class Knight extends Piece {
 class Pawn extends Piece {
     constructor(player) {
         super(player);
-        this.pawnFirstMove = undefined;
     }
     checkEnPassant(newLocation, _board, player) {
         let enPassantRow = newLocation.row + (player === Player.WHITE ? -1 : 1);
         let possibleTarget = _board.getPiece(Square.at(enPassantRow, newLocation.col));
-        return possibleTarget instanceof Pawn && possibleTarget.pawnFirstMove === _board.moveCount;
+        return possibleTarget instanceof Pawn && possibleTarget.firstMove === _board.moveCount;
     }
     pawnCaptureCheck(pieceLocation, newLocations, possibleMoves, _board) {
         for (let newLocation of newLocations) {
@@ -165,14 +196,9 @@ class Pawn extends Piece {
         return possibleMoves;
     }
     pawnCapture(location, possibleMoves, _board) {
-        if (this.player === Player.WHITE) {
-            let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)];
-            this.pawnCaptureCheck(location, newLocations, possibleMoves, _board);
-        }
-        else {
-            let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)];
-            this.pawnCaptureCheck(location, newLocations, possibleMoves, _board);
-        }
+        let newRow = location.row + (this.player === Player.WHITE ? 1 : -1);
+        let newLocations = [Square.at(newRow, location.col + 1), Square.at(newRow, location.col - 1)];
+        this.pawnCaptureCheck(location, newLocations, possibleMoves, _board);
     }
     getAvailableMoves(_board) {
         let location = _board.findPiece(this);
@@ -183,9 +209,8 @@ class Pawn extends Piece {
                 filteredPossibleMoves.push(move);
             }
         }
-        possibleMoves = filteredPossibleMoves;
-        this.pawnCapture(location, possibleMoves, _board);
-        return possibleMoves;
+        this.pawnCapture(location, filteredPossibleMoves, _board);
+        return filteredPossibleMoves;
     }
 }
 
@@ -196,16 +221,6 @@ class Queen extends Piece {
     getAvailableMoves(_board) {
         let location = _board.findPiece(this);
         return Piece.lateralMoves(location, _board).concat(Piece.diagonalMoves(location, _board));
-    }
-}
-
-class Rook extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        return Piece.lateralMoves(location, _board);
     }
 }
 
@@ -238,17 +253,29 @@ class Board {
         }
         throw new Error('The supplied piece is not on the board');
     }
+    moveEnPassant(movingPiece, fromSquare, toSquare) {
+        if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
+            let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1);
+            let targetLocation = Square.at(enPassantRow, toSquare.col);
+            this.setPiece(targetLocation, undefined);
+        }
+    }
+    moveCastling(movingPiece, fromSquare, toSquare) {
+        if (movingPiece instanceof King && Math.abs(fromSquare.col - toSquare.col) === 2) {
+            let rookCol = fromSquare.col - toSquare.col < 0 ? 7 : 0;
+            let rookFrom = Square.at(fromSquare.row, rookCol);
+            let rookTo = Square.at(fromSquare.row, fromSquare.col + Math.sign(toSquare.col - fromSquare.col));
+            this.movePiece(rookFrom, rookTo);
+        }
+    }
     movePiece(fromSquare, toSquare) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
-            if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
-                let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1);
-                let targetLocation = Square.at(enPassantRow, toSquare.col);
-                this.setPiece(targetLocation, undefined);
-            }
+            this.moveEnPassant(movingPiece, fromSquare, toSquare);
+            this.moveCastling(movingPiece, fromSquare, toSquare);
             this.moveCount++;
-            if (movingPiece instanceof Pawn && typeof movingPiece.pawnFirstMove === 'undefined') {
-                movingPiece.pawnFirstMove = this.moveCount;
+            if (typeof movingPiece.firstMove === 'undefined') {
+                movingPiece.firstMove = this.moveCount;
             }
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);

@@ -16,7 +16,7 @@ export class King extends Piece {
           let leftBound = Math.min(possibleRookLocation.col, board.findPiece(this).col) + 1
           let rightBound = Math.max(possibleRookLocation.col, board.findPiece(this).col) - 1
           for(let col = leftBound; col <= rightBound; col++) {
-              if(board.getPiece(Square.at(col, possibleRookLocation.row))) {
+              if(board.getPiece(Square.at(possibleRookLocation.row, col))) {
                   return false
               }
           }
@@ -41,7 +41,7 @@ export class King extends Piece {
           let possibleRookLocations = [Square.at(location.row, 0), Square.at(location.row, 7)]
           for(let possibleRookLocation of possibleRookLocations) {
               if(this.canCastle(possibleRookLocation, _board)) {
-                  let columnDifference = -Math.sign(location.col - possibleRookLocation.col)
+                  let columnDifference = Math.sign(possibleRookLocation.col - location.col)
                   possibleMoves.push(Square.at(location.row, location.col + 2 * columnDifference))
               }
           }
