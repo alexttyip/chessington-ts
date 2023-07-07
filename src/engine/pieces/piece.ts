@@ -46,13 +46,16 @@ export class Piece {
         let newCol = location.col + direction[1] * steps
         let newLocation = Square.at(newRow, newCol)
 
-        if(!board.isSquareWithinBoundsAndEmpty(newLocation)) {
-          if (Piece.canCapture(location, newLocation, board)) {
-            possibleMoves.push(newLocation)
-          }
+        if(board.isSquareWithinBoundsAndEmpty(newLocation)) {
+          possibleMoves.push(newLocation)
+        }
+        else if (Piece.canCapture(location, newLocation, board)) {
+          possibleMoves.push(newLocation)
           break
         }
-        possibleMoves.push(newLocation)
+        else {
+          break
+        }
       }
     }
     return possibleMoves

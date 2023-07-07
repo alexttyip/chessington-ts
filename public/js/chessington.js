@@ -25,10 +25,195 @@ class Square {
     }
 }
 
+class Piece {
+    constructor(player) {
+        this.player = player;
+    }
+    getAvailableMoves(_board) {
+        throw new Error('This method must be implemented, and return a list of available moves');
+    }
+    moveTo(board, newSquare) {
+        const currentSquare = board.findPiece(this);
+        board.movePiece(currentSquare, newSquare);
+    }
+    static isKing(piece) {
+        return (piece === null || piece === void 0 ? void 0 : piece.constructor.name) === 'King';
+    }
+    static canCapture(playerLocation, testLocation, board) {
+        if (!board.isInBoard(testLocation)) {
+            return false;
+        }
+        const testPiece = board.getPiece(testLocation);
+        const playerPiece = board.getPiece(playerLocation);
+        return !Piece.isKing(testPiece) && (playerPiece === null || playerPiece === void 0 ? void 0 : playerPiece.player) !== (testPiece === null || testPiece === void 0 ? void 0 : testPiece.player);
+    }
+    static findTargetsOrEdgesByDirection(location, board, directions) {
+        board.getPiece(location);
+        let possibleMoves = [];
+        for (let direction of directions) {
+            for (let steps = 1; steps < GameSettings.BOARD_SIZE; steps++) {
+                let newRow = location.row + direction[0] * steps;
+                let newCol = location.col + direction[1] * steps;
+                let newLocation = Square.at(newRow, newCol);
+                if (!board.isSquareWithinBoundsAndEmpty(newLocation)) {
+                    if (Piece.canCapture(location, newLocation, board)) {
+                        possibleMoves.push(newLocation);
+                    }
+                    break;
+                }
+                possibleMoves.push(newLocation);
+            }
+        }
+        return possibleMoves;
+    }
+    static diagonalMoves(location, board) {
+        let locationChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
+        return Piece.findTargetsOrEdgesByDirection(location, board, locationChanges);
+    }
+    static lateralMoves(location, board) {
+        let locationChanges = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        return Piece.findTargetsOrEdgesByDirection(location, board, locationChanges);
+    }
+}
+
+class Bishop extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        try {
+            let location = _board.findPiece(this);
+            return Piece.diagonalMoves(location, _board);
+        }
+        catch (e) {
+            return [];
+        }
+    }
+}
+
+class King extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        let possibleMoves = [];
+        for (let rowChange = -1; rowChange <= 1; rowChange++) {
+            for (let colChange = -1; colChange <= 1; colChange++) {
+                let newLocation = Square.at(location.row + rowChange, location.col + colChange);
+                if (Piece.canCapture(location, newLocation, _board)) {
+                    possibleMoves.push(newLocation);
+                }
+            }
+        }
+        return possibleMoves;
+    }
+}
+
+class Knight extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        let possibleMoves = [];
+        let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]];
+        for (let change of possibleChanges) {
+            let newLocation = Square.at(location.row + change[0], location.col + change[1]);
+            if (Piece.canCapture(location, newLocation, _board)) {
+                possibleMoves.push(newLocation);
+            }
+        }
+        return possibleMoves;
+    }
+}
+
+class Pawn extends Piece {
+    constructor(player) {
+        super(player);
+        this.pawnFirstMove = undefined;
+    }
+    checkEnPassant(newLocation, _board, player) {
+        let enPassantRow = newLocation.row + (player === Player.WHITE ? -1 : 1);
+        let possibleTarget = _board.getPiece(Square.at(enPassantRow, newLocation.col));
+        return possibleTarget instanceof Pawn && possibleTarget.pawnFirstMove === _board.moveCount;
+    }
+    pawnCaptureCheck(pieceLocation, newLocations, possibleMoves, _board) {
+        for (let newLocation of newLocations) {
+            if (Piece.canCapture(pieceLocation, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
+                possibleMoves.push(newLocation);
+            }
+            if (this.checkEnPassant(newLocation, _board, this.player)) {
+                possibleMoves.push(newLocation);
+            }
+        }
+    }
+    pawnMove(location, _board) {
+        let possibleMoves = [];
+        if (this.player === Player.WHITE) {
+            possibleMoves.push(Square.at(location.row + 1, location.col));
+            if (location.row === 1 && !_board.getPiece(Square.at(location.row + 1, location.col))) {
+                possibleMoves.push(Square.at(location.row + 2, location.col));
+            }
+        }
+        else {
+            possibleMoves.push(Square.at(location.row - 1, location.col));
+            if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
+                possibleMoves.push(Square.at(location.row - 2, location.col));
+            }
+        }
+        return possibleMoves;
+    }
+    pawnCapture(location, possibleMoves, _board) {
+        if (this.player === Player.WHITE) {
+            let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)];
+            this.pawnCaptureCheck(location, newLocations, possibleMoves, _board);
+        }
+        else {
+            let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)];
+            this.pawnCaptureCheck(location, newLocations, possibleMoves, _board);
+        }
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        let possibleMoves = this.pawnMove(location, _board);
+        let filteredPossibleMoves = [];
+        for (let move of possibleMoves) {
+            if (_board.isSquareWithinBoundsAndEmpty(move)) {
+                filteredPossibleMoves.push(move);
+            }
+        }
+        possibleMoves = filteredPossibleMoves;
+        this.pawnCapture(location, possibleMoves, _board);
+        return possibleMoves;
+    }
+}
+
+class Queen extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        return Piece.lateralMoves(location, _board).concat(Piece.diagonalMoves(location, _board));
+    }
+}
+
+class Rook extends Piece {
+    constructor(player) {
+        super(player);
+    }
+    getAvailableMoves(_board) {
+        let location = _board.findPiece(this);
+        return Piece.lateralMoves(location, _board);
+    }
+}
+
 class Board {
     constructor(currentPlayer) {
         this.currentPlayer = currentPlayer || Player.WHITE;
         this.board = this.createBoard();
+        this.moveCount = 0;
     }
     createBoard() {
         const board = new Array(GameSettings.BOARD_SIZE);
@@ -56,6 +241,15 @@ class Board {
     movePiece(fromSquare, toSquare) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+            if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
+                let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1);
+                let targetLocation = Square.at(enPassantRow, toSquare.col);
+                this.setPiece(targetLocation, undefined);
+            }
+            this.moveCount++;
+            if (movingPiece instanceof Pawn && typeof movingPiece.pawnFirstMove === 'undefined') {
+                movingPiece.pawnFirstMove = this.moveCount;
+            }
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer =
@@ -71,181 +265,8 @@ class Board {
         }
         return true;
     }
-    notOccupiedOrOutOfBounds(squareLocation) {
+    isSquareWithinBoundsAndEmpty(squareLocation) {
         return this.isInBoard(squareLocation) && !this.getPiece(squareLocation);
-    }
-}
-
-function isKing(piece) {
-    return (piece === null || piece === void 0 ? void 0 : piece.constructor.name) === 'King';
-}
-function canCapture(playerLocation, testLocation, board) {
-    if (!board.isInBoard(testLocation)) {
-        return false;
-    }
-    const testPiece = board.getPiece(testLocation);
-    const playerPiece = board.getPiece(playerLocation);
-    return !isKing(testPiece) && (playerPiece === null || playerPiece === void 0 ? void 0 : playerPiece.player) !== (testPiece === null || testPiece === void 0 ? void 0 : testPiece.player);
-}
-function findTargetsOrEdgesByDirection(location, board, directions) {
-    board.getPiece(location);
-    let possibleMoves = [];
-    for (let direction of directions) {
-        for (let steps = 1; steps < GameSettings.BOARD_SIZE; steps++) {
-            let newLocation = Square.at(location.row + direction[0] * steps, location.col + direction[1] * steps);
-            if (!board.notOccupiedOrOutOfBounds(newLocation)) {
-                if (canCapture(location, newLocation, board)) {
-                    possibleMoves.push(newLocation);
-                }
-                break;
-            }
-            possibleMoves.push(newLocation);
-        }
-    }
-    return possibleMoves;
-}
-function diagonalMoves(location, board) {
-    let locationChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
-    return findTargetsOrEdgesByDirection(location, board, locationChanges);
-}
-function lateralMoves(location, board) {
-    let locationChanges = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-    return findTargetsOrEdgesByDirection(location, board, locationChanges);
-}
-class Piece {
-    constructor(player) {
-        this.player = player;
-    }
-    getAvailableMoves(_board) {
-        throw new Error('This method must be implemented, and return a list of available moves');
-    }
-    moveTo(board, newSquare) {
-        const currentSquare = board.findPiece(this);
-        board.movePiece(currentSquare, newSquare);
-    }
-}
-
-class Bishop extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        try {
-            let location = _board.findPiece(this);
-            return diagonalMoves(location, _board);
-        }
-        catch (e) {
-            return [];
-        }
-    }
-}
-
-class King extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        let possibleMoves = [];
-        let possibleChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1], [0, 1], [0, -1], [-1, 0], [1, 0]];
-        for (let change of possibleChanges) {
-            let newLocation = Square.at(location.row + change[0], location.col + change[1]);
-            if (canCapture(location, newLocation, _board)) {
-                possibleMoves.push(newLocation);
-            }
-        }
-        return possibleMoves;
-    }
-}
-
-class Knight extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        let possibleMoves = [];
-        let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]];
-        for (let change of possibleChanges) {
-            let newLocation = Square.at(location.row + change[0], location.col + change[1]);
-            if (canCapture(location, newLocation, _board)) {
-                possibleMoves.push(newLocation);
-            }
-        }
-        return possibleMoves;
-    }
-}
-
-class Pawn extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    pawnMove(location, _board) {
-        let possibleMoves = [];
-        if (this.player === Player.WHITE) {
-            possibleMoves.push(Square.at(location.row + 1, location.col));
-            if (location.row === 1 && !_board.getPiece(Square.at(location.row + 1, location.col))) {
-                possibleMoves.push(Square.at(location.row + 2, location.col));
-            }
-        }
-        else {
-            possibleMoves.push(Square.at(location.row - 1, location.col));
-            if (location.row === 6 && !_board.getPiece(Square.at(location.row - 1, location.col))) {
-                possibleMoves.push(Square.at(location.row - 2, location.col));
-            }
-        }
-        return possibleMoves;
-    }
-    pawnCapture(location, possibleMoves, _board) {
-        if (this.player === Player.WHITE) {
-            let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)];
-            for (let newLocation of newLocations) {
-                if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-                    possibleMoves.push(newLocation);
-                }
-            }
-        }
-        else {
-            let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)];
-            for (let newLocation of newLocations) {
-                if (canCapture(location, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
-                    possibleMoves.push(newLocation);
-                }
-            }
-        }
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        let possibleMoves = this.pawnMove(location, _board);
-        let filteredPossibleMoves = [];
-        for (let move of possibleMoves) {
-            if (_board.notOccupiedOrOutOfBounds(move)) {
-                filteredPossibleMoves.push(move);
-            }
-        }
-        possibleMoves = filteredPossibleMoves;
-        this.pawnCapture(location, possibleMoves, _board);
-        return possibleMoves;
-    }
-}
-
-class Queen extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        return lateralMoves(location, _board).concat(diagonalMoves(location, _board));
-    }
-}
-
-class Rook extends Piece {
-    constructor(player) {
-        super(player);
-    }
-    getAvailableMoves(_board) {
-        let location = _board.findPiece(this);
-        return lateralMoves(location, _board);
     }
 }
 

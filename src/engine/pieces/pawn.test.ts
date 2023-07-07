@@ -43,9 +43,11 @@ describe('Pawn', () => {
 
     it('can perform en passant', () => {
       const pawn = new Pawn(Player.WHITE)
-      board.setPiece(Square.at(4, 3), pawn)
+      board.setPiece(Square.at(3, 3), pawn)
       const opponentPawn = new Pawn(Player.BLACK)
-      board.setPiece(Square.at(6,2), pawn)
+      board.setPiece(Square.at(6,2), opponentPawn)
+
+      board.movePiece(Square.at(3, 3), Square.at(4, 3))
       board.movePiece(Square.at(6, 2), Square.at(4, 2))
       const moves = pawn.getAvailableMoves(board)
 
@@ -86,6 +88,19 @@ describe('Pawn', () => {
       const moves = pawn.getAvailableMoves(board)
 
       expect(moves).toHaveLength(0)
+    })
+
+    it('can perform en passant', () => {
+      const pawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(4, 3), pawn)
+      const opponentPawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(1,2), opponentPawn)
+
+      board.movePiece(Square.at(4, 3), Square.at(3, 3))
+      board.movePiece(Square.at(1, 2), Square.at(3, 2))
+      const moves = pawn.getAvailableMoves(board)
+
+      expect(moves).toContainEqual(Square.at(2, 2))
     })
   })
 
@@ -151,16 +166,5 @@ describe('Pawn', () => {
     const moves = pawn.getAvailableMoves(board)
 
     expect(moves).not.toContainEqual(Square.at(5, 3))
-  })
-
-  it('can perform en passant', () => {
-    const pawn = new Pawn(Player.BLACK)
-    board.setPiece(Square.at(4, 3), pawn)
-    const opponentPawn = new Pawn(Player.WHITE)
-    board.setPiece(Square.at(6,2), pawn)
-    board.movePiece(Square.at(6, 2), Square.at(4, 2))
-    const moves = pawn.getAvailableMoves(board)
-
-    expect(moves).toContainEqual(Square.at(5, 2))
   })
 })

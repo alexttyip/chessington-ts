@@ -8,12 +8,7 @@ export class Bishop extends Piece {
   }
 
   getAvailableMoves(_board: Board) {
-    try {
       let location = _board.findPiece(this)
       return Piece.diagonalMoves(location, _board)
-    }
-    catch (e) {
-      return [] as Square[]
-    }
   }
 }

@@ -43,9 +43,24 @@ export default class Board {
     throw new Error('The supplied piece is not on the board')
   }
 
+  moveEnPassant(movingPiece: Piece, fromSquare: Square, toSquare: Square) {
+    if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
+      let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1)
+      let targetLocation = Square.at(enPassantRow, toSquare.col)
+      this.setPiece(targetLocation, undefined)
+    }
+  }
+
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
+
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+      // if (movingPiece instanceof Pawn && typeof this.getPiece(toSquare) === 'undefined' && fromSquare.col !== toSquare.col) {
+      //   let enPassantRow = toSquare.row + (this.currentPlayer === Player.WHITE ? -1 : 1)
+      //   let targetLocation = Square.at(enPassantRow, toSquare.col)
+      //   this.setPiece(targetLocation, undefined)
+      // }
+      this.moveEnPassant(movingPiece, fromSquare, toSquare)
       this.moveCount++
       if (movingPiece instanceof Pawn && typeof movingPiece.pawnFirstMove === 'undefined') {
         movingPiece.pawnFirstMove = this.moveCount

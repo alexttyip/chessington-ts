@@ -10,11 +10,18 @@ export class Pawn extends Piece {
     this.pawnFirstMove = undefined
   }
 
-
+  checkEnPassant(newLocation: Square,  _board: Board, player: Player) : boolean {
+    let enPassantRow = newLocation.row + (player === Player.WHITE ? -1 : 1)
+    let possibleTarget = _board.getPiece(Square.at(enPassantRow, newLocation.col))
+    return possibleTarget instanceof Pawn && possibleTarget.pawnFirstMove === _board.moveCount
+  }
 
   pawnCaptureCheck(pieceLocation: Square, newLocations: Square[], possibleMoves: Square[], _board: Board) : void {
     for (let newLocation of newLocations) {
       if (Piece.canCapture(pieceLocation, newLocation, _board) && _board.getPiece(newLocation) !== undefined) {
+        possibleMoves.push(newLocation)
+      }
+      if (this.checkEnPassant(newLocation, _board, this.player)) {
         possibleMoves.push(newLocation)
       }
     }
@@ -37,14 +44,9 @@ export class Pawn extends Piece {
     return possibleMoves
   }
   pawnCapture(location: Square, possibleMoves: Square[], _board: Board) {
-    if(this.player === Player.WHITE) {
-      let newLocations = [Square.at(location.row + 1, location.col + 1), Square.at(location.row + 1, location.col - 1)]
-      this.pawnCaptureCheck(location, newLocations, possibleMoves, _board)
-    }
-    else {
-      let newLocations = [Square.at(location.row - 1, location.col + 1), Square.at(location.row - 1, location.col - 1)]
-      this.pawnCaptureCheck(location, newLocations, possibleMoves, _board)
-    }
+    let newRow = location.row + (this.player === Player.WHITE ? 1 : -1)
+    let newLocations = [Square.at(newRow, location.col + 1), Square.at(newRow, location.col - 1)]
+    this.pawnCaptureCheck(location, newLocations, possibleMoves, _board)
   }
   getAvailableMoves(_board: Board): Square[] {
       let location = _board.findPiece(this)
@@ -55,9 +57,8 @@ export class Pawn extends Piece {
           filteredPossibleMoves.push(move);
         }
       }
-      possibleMoves = filteredPossibleMoves
-      this.pawnCapture(location, possibleMoves, _board)
-      return possibleMoves
+      this.pawnCapture(location, filteredPossibleMoves, _board)
+      return filteredPossibleMoves
     }
 }
 
