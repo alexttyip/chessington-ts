@@ -40,17 +40,11 @@ export class Pawn extends Piece {
   getAvailableMoves(_board: Board): Square[] {
     const currentSquare = _board.findPiece(this)
     let availableMoves: Square[] = []
-    let direction
-    if (this.player === Player.WHITE) {
-      direction = 1
-    } else {
-      direction = -1
-    }
+    let direction = this.player === Player.WHITE ? 1 : -1
     availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, direction))
     if (currentSquare.row === 1 || currentSquare.row === 6) {
       availableMoves.push(...this.returnMoveIfItIsPossible(_board, currentSquare, 2 * direction))
     }
-
     availableMoves.push(...this.takeDiagonalPiece(_board, direction))
     return availableMoves
   }
