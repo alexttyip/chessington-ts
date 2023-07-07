@@ -74,8 +74,7 @@ export class Piece {
       return false
     }
 
-    if (this)
-      return true
+    return true
   }
 
   getMoveIfValid(board: Board, rowDelta: number, colDelta: number) {
@@ -83,7 +82,6 @@ export class Piece {
     const currentSquare = board.findPiece(this)
     let newRow = currentSquare.row + rowDelta
     let newCol = currentSquare.col + colDelta
-
 
 
     if (this.isCoordinateOutOfBound(newRow, newCol)) {
