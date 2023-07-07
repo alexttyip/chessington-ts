@@ -61,6 +61,17 @@ describe('Pawn', () => {
 
       expect(moves).toContainEqual(Square.at(5, 3))
     })
+
+    it('en passant remove black pawn', () => {
+      const pawn = new Pawn(Player.WHITE)
+      board.setPiece(Square.at(4, 4), pawn)
+      const blackPawn = new Pawn(Player.BLACK)
+      board.setPiece(Square.at(6, 3), blackPawn)
+      board.currentPlayer = Player.BLACK
+      board.movePiece(Square.at(6, 3), Square.at(4, 3))
+      pawn.moveTo(board, Square.at(5, 3))
+      expect(board.getPiece(Square.at(4, 3))).toEqual(undefined)
+    })
   })
 
   describe('black pawns', () => {
@@ -181,5 +192,15 @@ describe('Pawn', () => {
     const moves = pawn.getAvailableMoves(board)
 
     expect(moves).toContainEqual(Square.at(2, 0))
+  })
+
+  it('en passant remove white pawn', () => {
+    const pawn = new Pawn(Player.BLACK)
+    board.setPiece(Square.at(3, 1), pawn)
+    const whitePawn = new Pawn(Player.WHITE)
+    board.setPiece(Square.at(1, 0), whitePawn)
+    board.movePiece(Square.at(1, 0), Square.at(3, 0))
+    pawn.moveTo(board, Square.at(2, 0))
+    expect(board.getPiece(Square.at(3, 0))).toEqual(undefined)
   })
 })
