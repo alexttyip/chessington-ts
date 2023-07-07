@@ -43,10 +43,31 @@ export class Piece {
   isKing() {
     return false;
   }
+
+  getMovesAlongAxes(_board:Board, directions: {rowDirection:number, colDirection:number}[], currentSquare:Square) {
+    let moves:Square[] = [];
+    for(const direction of directions) {
+      let index = 1;
+      let moveStatus = undefined
+
+      do{
+        let newRow = currentSquare.row + index * direction.rowDirection;
+        let newCol = currentSquare.col + index * direction.colDirection;
+
+        moveStatus = Piece.getMoveStatus(_board, this, newRow, newCol);
+        if(moveStatus !== SquareStatus.UNREACHABLE){
+          moves.push(Square.at(newRow, newCol));
+        }
+
+        index++;
+      } while(moveStatus === SquareStatus.EMPTY);
+    }
+    return moves;
+  }
 }
 
 export enum SquareStatus {
   CAPTURABLE,
   UNREACHABLE,
   EMPTY
-};
+}
