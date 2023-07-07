@@ -16,7 +16,7 @@ export class Pawn extends Piece {
         return []
       }
     }
-    if (!this.isCoordinateOutOfBound(newPosition.row,newPosition.col) && _board.getPiece(newPosition) === undefined) {
+    if (!this.isCoordinateOutOfBound(newPosition.row,newPosition.col) && !_board.getPiece(newPosition)) {
       return [newPosition]
     }
     return []

@@ -123,7 +123,7 @@ export class Piece {
 
   isMoveEnPassant(board: Board, newSquare: Square) {
     const currentSquare = board.findPiece(this)
-    return this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && board.getPiece(newSquare) === undefined;
+    return this.constructor.name === 'Pawn' && currentSquare.col !== newSquare.col && !board.getPiece(newSquare);
 
   }
 
