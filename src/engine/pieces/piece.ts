@@ -14,12 +14,12 @@ export class Piece {
     let availableMoves = []
     let hitEnemyYet = false
     for (let i = 1; i < 8; i++) {
+      if (hitEnemyYet) {
+        break
+      }
       let newRow = currentSquare.row + rowDelta * i
       let newCol = currentSquare.col + colDelta * i
       if (!this.isCoordinateValid(newRow, newCol, board)) {
-        break
-      }
-      if (hitEnemyYet) {
         break
       }
       if (this.isSteppingOnEnemyPiece(newRow, newCol, board)) {
