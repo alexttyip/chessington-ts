@@ -55,7 +55,7 @@ export class Pawn extends Piece {
       availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1))
     }
     if (this.canEnPassantThisSquare(currentSquare.row + direction, currentSquare.col + 1, _board, direction)) {
-      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col - 1))
+      availableMoves.push(new Square(currentSquare.row + direction, currentSquare.col + 1))
     }
     return availableMoves
   }

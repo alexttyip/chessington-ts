@@ -134,6 +134,8 @@ export class Piece {
     if (this.isMoveEnPassant(board, newSquare)) {
       if (this.player === Player.WHITE) {
         board.setPiece(new Square(newSquare.row - 1, newSquare.col), undefined)
+      } else {
+        board.setPiece(new Square(newSquare.row + 1, newSquare.col), undefined)
       }
     }
     board.movePiece(currentSquare, newSquare)
