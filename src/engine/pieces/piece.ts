@@ -19,12 +19,12 @@ export function canCapture(playerLocation: Square, testLocation: Square, board: 
   return !isKing(testPiece) && playerPiece?.player !== testPiece?.player
 }
 
-export function exploreSides(location: Square, board: Board, locationChanges: number[][]) {
+export function findTargetsOrEdgesByDirection(location: Square, board: Board, directions: number[][]) {
   const piece = board.getPiece(location)
   let possibleMoves = []
-  for (let locationChange of locationChanges) {
+  for (let direction of directions) {
     for(let steps = 1; steps < gameSettings.BOARD_SIZE; steps++) {
-      let newLocation = Square.at(location.row + locationChange[0] * steps, location.col + locationChange[1] * steps)
+      let newLocation = Square.at(location.row + direction[0] * steps, location.col + direction[1] * steps)
 
       if(!board.notOccupiedOrOutOfBounds(newLocation)) {
         if (canCapture(location, newLocation, board)) {
@@ -40,13 +40,13 @@ export function exploreSides(location: Square, board: Board, locationChanges: nu
 
 export function diagonalMoves(location : Square, board: Board) : Square[] {
   let locationChanges = [[1, 1], [-1, 1], [1, -1], [-1, -1]]
-  return exploreSides(location, board, locationChanges)
+  return findTargetsOrEdgesByDirection(location, board, locationChanges)
 }
 
 
 export function lateralMoves(location : Square, board : Board) : Square[] {
   let locationChanges = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-  return exploreSides(location, board, locationChanges)
+  return findTargetsOrEdgesByDirection(location, board, locationChanges)
 }
 
 export class Piece {
