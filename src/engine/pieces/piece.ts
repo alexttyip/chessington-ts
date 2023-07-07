@@ -102,13 +102,13 @@ export class Piece {
   getDiagonalMoves(board: Board) {
     let availableMoves: Square[] = []
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, 1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, 1))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, 1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, 1))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, 1, -1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, 1, -1))
 
-    availableMoves = availableMoves.concat(this.goInADirectionAndReturnAvailableMoves(board, -1, -1))
+    availableMoves.push(...this.goInADirectionAndReturnAvailableMoves(board, -1, -1))
 
     return availableMoves as Square[]
 
