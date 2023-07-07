@@ -26,15 +26,25 @@ export class Pawn extends Piece {
     const currentSquare = _board.findPiece(this)
     let possibleDiagonals : Square[] = []
     let newRow = currentSquare.row + direction
-    this.addMoveIfCanCapture(newRow, currentSquare.col+1, _board, possibleDiagonals)
-    this.addMoveIfCanCapture(newRow, currentSquare.col-1, _board, possibleDiagonals)
+    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col+1, _board))
+    possibleDiagonals.push(...this.returnMoveIfCanCapture(newRow, currentSquare.col-1, _board))
     return possibleDiagonals
   }
 
-  addMoveIfCanCapture(newRow: number, newCol: number, _board: Board, possibleDiagonals: Square[]) {
-    if (!this.isCoordinateOutOfBound(newRow, newCol) && this.isSteppingOnEnemyPiece(newRow, newCol, _board) && !this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
-      possibleDiagonals.push(new Square(newRow, newCol))
+  returnMoveIfCanCapture(newRow: number, newCol: number, _board: Board) {
+    if (this.isCoordinateOutOfBound(newRow, newCol)) {
+      return []
     }
+
+    if (!this.isSteppingOnEnemyPiece(newRow, newCol, _board)) {
+      return []
+    }
+
+    if (this.isSteppingOnEnemyKing(newRow, newCol, _board)) {
+      return []
+    }
+
+    return [new Square(newRow, newCol)]
   }
 
   canEnPassantThisSquare(newRow: number, newCol: number, _board: Board, direction: number) {
