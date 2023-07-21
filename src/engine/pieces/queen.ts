@@ -9,6 +9,7 @@ export class Queen extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+      let location = _board.findPiece(this)
+      return Piece.lateralMoves(location, _board).concat(Piece.diagonalMoves(location, _board))
   }
 }

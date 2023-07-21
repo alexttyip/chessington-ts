@@ -9,6 +9,15 @@ export class Knight extends Piece {
   }
 
   getAvailableMoves(_board: Board): Square[] {
-    return [] as Square[]
+      let location = _board.findPiece(this)
+      let possibleMoves = [];
+      let possibleChanges = [[1, 2], [-1, 2], [1, -2], [-1, -2], [2, 1], [2, -1], [-2, 1], [-2, -1]]
+      for (let change of possibleChanges) {
+        let newLocation = Square.at(location.row + change[0], location.col + change[1])
+        if (Piece.canCapture(location, newLocation, _board)) {
+          possibleMoves.push(newLocation)
+        }
+      }
+      return possibleMoves
   }
 }
