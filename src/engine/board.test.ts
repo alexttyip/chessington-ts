@@ -34,5 +34,23 @@ describe('Board', () => {
       // Assert
       expect(board.findPiece(pawn)).toEqual(square) // Object equivalence: different objects, same data
     })
+
+    it('en passant occurs', () => {
+      // Given
+      const blackPawn = new Pawn(Player.BLACK);
+      const whitePawn = new Pawn(Player.WHITE);
+
+      board.setPiece(Square.at(6, 0), blackPawn);
+      board.setPiece(Square.at(4, 1), whitePawn);
+
+      board.currentPlayer = Player.BLACK;
+
+      //when
+      blackPawn.moveTo(board, Square.at(4, 0));
+      whitePawn.moveTo(board, Square.at(5,0));
+
+      // Then
+      expect(() => board.findPiece(blackPawn)).toThrow()
+    })
   })
 })

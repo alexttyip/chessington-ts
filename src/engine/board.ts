@@ -7,8 +7,8 @@ export default class Board {
   currentPlayer: symbol
   board: (Piece | undefined)[][]
 
-  constructor() {
-    this.currentPlayer = Player.WHITE
+  constructor(currentPlayer?: symbol) {
+    this.currentPlayer = currentPlayer || Player.WHITE
     this.board = this.createBoard()
   }
 
@@ -42,10 +42,44 @@ export default class Board {
   movePiece(fromSquare: Square, toSquare: Square) {
     const movingPiece = this.getPiece(fromSquare)
     if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+      if(movingPiece.isPawn && this.isDiagonalMove(fromSquare, toSquare) && this.isEmptySquare(toSquare)){
+        console.log("enpassant");
+        // En Passant move
+        let delta = this.currentPlayer === Player.WHITE ? 1 : -1;
+        let capturedSquare = Square.at(toSquare.row - delta, toSquare.col);
+        this.setPiece(capturedSquare, undefined);
+      }
+
       this.setPiece(toSquare, movingPiece)
       this.setPiece(fromSquare, undefined)
+      movingPiece.moved = true;
       this.currentPlayer =
         this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE
+
+      for(const row of this.board) {
+        for(const piece of row) {
+          if(!!piece) {
+            piece.vulnerableToEnPassant = false;
+          }
+        }
+      }
     }
   }
+
+  isDiagonalMove(fromSquare:Square, toSquare:Square) {
+    console.log("diag check");
+    let rowDiff = Math.abs(fromSquare.row - toSquare.row);
+    console.log(rowDiff)
+    let colDiff = Math.abs(fromSquare.col - toSquare.col);
+    console.log(colDiff)
+
+    return rowDiff === colDiff;
+  }
+
+  isEmptySquare(square:Square) {
+    console.log("empty check");
+    return this.getPiece(square) === undefined;
+  }
+
+
 }
